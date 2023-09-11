@@ -1,3 +1,5 @@
+import threading
+
 import psutil
 
 from processing import app, streamlit_app
@@ -9,86 +11,12 @@ import streamlit as st
 import os
 import subprocess
 
-
-@app.route('/')
-@app.route('/home_page')
-def home_page():
-    return render_template("home.html")
-
-
-# Initialize the response variable
-response = {}
-
-@app.route('/process_form', methods=['POST'])
-def process_form():
-    global response
-
-    if 'download_button_domestic' in request.form:
-        # Retrieve user input
-        path = request.form.get('location')
-        choice = request.form.get('category-domestic')  # Use 'category-download' for domestic data
-        website = request.form.get('domestic-websites')
-        if website == 'website1':
-            try:
-                DomesticData.GDP(path, choice).scrap_GDP_Choice()
-                response = {'status': 'success', 'message': 'Data download successful!', 'dir:': path}
-            except Exception as e:
-                response = {'status': 'error', 'message': f'Error: {str(e)}'}
-        else:
-            try:
-                DomesticData.NBC(path, choice).scrap_NBC_Choice()
-                response = {'status': 'success', 'message': 'Data download successful!', 'dir:': path}
-            except Exception as e:
-                response = {'status': 'error', 'message': f'Error: {str(e)}'}
-
-    if "download_button_international" in request.form:
-        # Retrieve user input
-        location = request.form.get('path-international')
-        website = request.form.get('international-website')
-        day = request.form.get('day')
-        month = request.form.get('month')
-        year = request.form.get('year')
-        scrapping = International.Scraper(path=location, year=year, day=day, month=month)
-        if website == 'website1':
-            try:
-                scrapping.opec_org()
-                response = {'status': 'success', 'message': 'Data download successful!'}
-            except Exception as e:
-                response = {'status': 'error', 'message': f'Error: {str(e)}'}
-        elif website == 'website2':
-            scrapping.ExchangeRateIndonesia()
-            try:
-                response = {'status': 'success', 'message': 'Data download successful!'}
-            except Exception as e:
-                response = {'status': 'error', 'message': f'Error: {str(e)}'}
-        elif website == 'website3':
-            scrapping.thailand_exchange_rate()
-            try:
-                response = {'status': 'success', 'message': 'Data download successful!'}
-            except Exception as e:
-                response = {'status': 'error', 'message': f'Error: {str(e)}'}
-        elif website == 'website4':
-            scrapping.exp_srilanka()
-            try:
-                response = {'status': 'success', 'message': 'Data download successful!'}
-            except Exception as e:
-                response = {'status': 'error', 'message': f'Error: {str(e)}'}
-        elif website == 'website6':
-            scrapping.adb()
-            try:
-                response = {'status': 'success', 'message': 'Data download successful!'}
-            except Exception as e:
-                response = {'status': 'error', 'message': f'Error: {str(e)}'}
-
-    # Handle other form submissions or render the page as needed
-    return render_template('home.html', response=response)
-
-
 # Define the Streamlit process globally
 streamlit_process = None
-@app.route('/streamlit')
-def streamlit_page():
-    global streamlit_process  # Declare the variable as global
+
+# Function to start the Streamlit process in a separate thread
+def start_streamlit():
+    global streamlit_process
 
     # Check if a Streamlit process is already running
     if streamlit_process is None or not psutil.pid_exists(streamlit_process.pid):
@@ -108,6 +36,80 @@ def streamlit_page():
             print("Error:", e)
     else:
         print("Streamlit is already running")
+
+# Route to the home page
+@app.route('/')
+@app.route('/home_page')
+def home_page():
+    # Start the Streamlit process in a separate thread
+    streamlit_thread = threading.Thread(target=start_streamlit)
+    streamlit_thread.start()
+    streamlit_thread.join(5)
+
+    return render_template("home.html")
+
+def responding(func):
+    try:
+        func
+        responses = {'status': 'success', 'message': 'Data download successful!'}
+    except Exception as e:
+        responses = {'status': 'error', 'message': f'Error: {str(e)}'}
+    return responses
+
+# Initialize the response variable
+response = {}
+@app.route('/process_form', methods=['POST'])
+def process_form():
+    global response
+
+    if 'download_button_domestic' in request.form:
+        # Retrieve user input
+        path = request.form.get('location')
+        choice = request.form.get('category-domestic')  # Use 'category-download' for domestic data
+        website = request.form.get('domestic-websites')
+
+        if website == 'website1':
+            response = responding(DomesticData.GDP(path, choice).scrap_GDP_Choice())
+        else:
+            response = responding(DomesticData.NBC(path, choice).scrap_NBC_Choice())
+
+    if "download_button_international" in request.form:
+        # Retrieve user input
+        location = request.form.get('path-international')
+        website = request.form.get('international-website')
+        day = request.form.get('day')
+        month = request.form.get('month')
+        year = request.form.get('year')
+
+        start_date = request.form.get('start_date')
+        end_date = request.form.get('end_date')
+        # page_number = int(request.form.get('page_number'))
+        input_date_str = request.form.get('input_date_str')
+
+        scrapping = International.Scraper(path=location, year=year, day=day, month=month)
+        if website == 'website1':
+            response = responding(scrapping.opec_org())
+        elif website == 'website2':
+            response = responding(scrapping.ExchangeRateIndonesia())
+        elif website == 'website3':
+            response = responding(scrapping.thailand_exchange_rate())
+        elif website == 'website4':
+            response = responding(scrapping.exp_srilanka())
+        elif website == 'website5':
+            response = responding(scrapping.china_exchange_rate(path=location, start_date=start_date, end_date=end_date))
+        elif website == 'website6':
+            response = responding(scrapping.adb())
+        elif website == 'website7':
+            response = responding(scrapping.banglashdesh_ex_rate(input_date_str=input_date_str))
+
+    # Handle other form submissions or render the page as needed
+    return render_template('home.html', response=response)
+
+
+
+@app.route('/streamlit')
+def streamlit_page():
+
 
     return render_template('streamlit.html')
 

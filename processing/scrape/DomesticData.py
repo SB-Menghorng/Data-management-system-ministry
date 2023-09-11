@@ -112,7 +112,3 @@ class NBC:
                 url = url_web + i + ".php"
                 scrap_NBC(path, url, i)
 
-
-# location = r"D:\Intership\Labour ministry of combodain\demo"
-# category = 'all'
-# GDP(location, category).scrap_GDP_Choice()

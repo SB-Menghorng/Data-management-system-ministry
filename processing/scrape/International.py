@@ -13,7 +13,10 @@ import requests
 import wget
 import pandas as pd
 import os
+
+from processing.scrape.Banglasdesh_ex_rate.mainb import Banglasdesh
 from processing.scrape.Bank_thianland.thailand_exchange_rate import Bank_thailand_scraper
+from processing.scrape.E_change_Rate_of_China.my_package.scrapers.forex_scraper import ForexScraper
 from processing.scrape.exp_srilanka import exp_sri_lanka
 from processing.scrape.ADB import scraper
 
@@ -311,15 +314,41 @@ class Scraper:
         path = self.path
         scraper(path)
 
+    def china_exchange_rate(self, path, start_date, end_date, driver_path=driver_path):
+        # Specify the target currency
+        target_currency = "USD"
+        driver_path = driver_path
+
+        # Initialize the ForexScraper with the provided driver_path
+        scraper = ForexScraper(driver_path)
+
+        # Scrape forex data
+        forex_data = scraper.scrape_data(target_currency, start_date, end_date)
+
+        # Specify the destination directory for the CSV file
+        destination_dir = path  # Use the provided path as the destination directory
+
+        # Create the destination directory if it doesn't exist
+        os.makedirs(destination_dir, exist_ok=True)
+
+        # Define the CSV file name based on start_date and end_date
+        csv_filename = f"chExRate_{start_date}_to_{end_date}.csv"
+
+        # Construct the full path to the CSV file
+        csv_filepath = os.path.join(destination_dir, csv_filename)
+
+        # Save the scraped data to the CSV file
+        forex_data.to_csv(csv_filepath, index=False)
+
+        print(f"Data saved to {csv_filepath}")
+
+    def banglashdesh_ex_rate(self, input_date_str):
+        path = self.path
+        scraping = Banglasdesh(path)
+        scraping.mainbd(path,input_date_str,driver_path=driver_path)
 
 
 
 
 
-# #
-# internationaux = Scraper("D:\Intership\Labour ministry of combodain\demo", None, None, None)
-#
-# # Function for OPEC
-# internationaux.thailand_exchange_rate()
-# # # Function for Exchange Rate Indonesia
-# # internationaux.ExchangeRateIndonesia()
+
