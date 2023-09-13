@@ -16,7 +16,7 @@ class GDP:
         soup = BeautifulSoup(response.content, "html.parser")
 
         # Specify the destination directory
-        destination_dir = path + '\\' + link.split("/")[-1].replace('statistics-by-', '')
+        destination_dir = os.path.join(path, link.split("/")[-1].replace('statistics-by-', ''))
 
         # Create the destination directory if it doesn't exist
         os.makedirs(destination_dir, exist_ok=True)
@@ -30,7 +30,7 @@ class GDP:
         for excel_link in xlsx:
             link = excel_link
             filename = os.path.join(destination_dir)
-            response = wget.download(url=link, out=filename)
+            wget.download(url=link, out=filename)
 
     def scrap_GDP_Choice(self):
         choice = self.choice
@@ -79,7 +79,7 @@ class NBC:
         for xlsx_link in xlsx_links:
             url = "https://www.nbc.gov.kh" + xlsx_link[5:]
             filename = os.path.join(destination_dir, xlsx_link.split("/")[-1])
-            response = wget.download(url=url, out=filename)
+            wget.download(url=url, out=filename)
 
     def scrap_NBC_Choice(self):
         choice = self.choice

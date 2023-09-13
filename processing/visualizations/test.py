@@ -2,7 +2,8 @@ import time
 
 import streamlit as st
 
-st.set_page_config(layout="wide")
+# # setting up the streamlit page
+# st.set_page_config(page_title='makraa reports',layout='wide')
 
 
 def main():
