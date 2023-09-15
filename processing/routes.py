@@ -21,11 +21,13 @@ def start_streamlit():
     # Check if a Streamlit process is already running
     if streamlit_process is None or not psutil.pid_exists(streamlit_process.pid):
         # Streamlit is not running, so start a new process
-        streamlit_command = ["streamlit", "run", psf, "--server.headless", "true"]
+        streamlit_command = ["streamlit", "run", psf,
+                             "--server.headless", "true",
+                             "--server.enableXsrfProtection", "false"]
 
         try:
-            streamlit_process = subprocess.Popen(streamlit_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                                 text=True)
+            streamlit_process = subprocess.Popen(streamlit_command, stdout=subprocess.PIPE,
+                                                 stderr=subprocess.PIPE, text=True)
             out, err = streamlit_process.communicate()
 
             if streamlit_process.returncode != 0:
@@ -48,7 +50,6 @@ def home_page():
     streamlit_thread.start()
     streamlit_thread.join(3)
     session.clear()
-
     return render_template("home.html")
 
 

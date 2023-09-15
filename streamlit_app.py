@@ -4,8 +4,6 @@ from processing.visualizations.merchandise_visualizing import dom_merchandise
 import streamlit as st
 from processing.visualizations.dashborad import dashboard1, dashboard2, dashboard3
 
-
-
 if __name__ == "__main__":
     # Call the function to read and delete the shared data
     # read_and_delete_shared_data()
