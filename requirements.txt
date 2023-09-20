@@ -11,3 +11,6 @@ openpyxl
 streamlit-option-menu
 plotly
 matplotlib
+ipywidgets
+mysql
+--user mysql-connector-python

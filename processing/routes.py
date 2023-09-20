@@ -21,7 +21,7 @@ def start_streamlit():
     # Check if a Streamlit process is already running
     if streamlit_process is None or not psutil.pid_exists(streamlit_process.pid):
         # Streamlit is not running, so start a new process
-        streamlit_command = ["streamlit", "run", psf, "--server.headless", "true"]
+        streamlit_command = ["streamlit", "run", psf]
 
         try:
             streamlit_process = subprocess.Popen(streamlit_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -37,6 +37,7 @@ def start_streamlit():
             print("Error:", e)
     else:
         print("Streamlit is already running")
+        
 
 
 # Route to the home page
@@ -103,6 +104,7 @@ def process_form():
         input_date_str = request.form.get('input_date_str')
 
         scrapping = International.Scraper(path=path, year=year, day=day, month=month)
+
         if website == 'website1':
             response = responding(scrapping.opec_org())
         elif website == 'website2':

@@ -38,6 +38,18 @@ class DomesticData:
 
         return df_list
 
+    def monetary_and_financial_statistics_data(self):
+        option = 'monetary_and_financial_statistics_data'
+        files = self.get_files(option)
+
+        df_list = []
+        for file in files:
+            csv_filename = clean_3(file, self.destination_directory)
+            df = renameCol2Int(csv_filename)
+            df_list.append(df)
+
+        return df_list
+
 
 
 # path = r"D:\Intership\Labour ministry of combodain\demo"

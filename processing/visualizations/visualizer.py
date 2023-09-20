@@ -10,6 +10,9 @@ def bar():
                                icons=['house', 'gear'], menu_icon="cast", default_index=1)
         selected
 
+
 path = shared_data['path']
+
+
 def domestic():
     dom_merchandise(path)
