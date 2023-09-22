@@ -23,7 +23,8 @@ def start_streamlit():
         # Streamlit is not running, so start a new process
         streamlit_command = ["streamlit", "run", psf,
                              "--server.headless", "true",
-                             "--server.enableXsrfProtection", "false"]
+                             "--server.enableXsrfProtection", "false",
+                             "--server.port", "8505"]
 
         try:
             streamlit_process = subprocess.Popen(streamlit_command, stdout=subprocess.PIPE,
