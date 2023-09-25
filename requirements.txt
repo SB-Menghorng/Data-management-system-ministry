@@ -3,14 +3,17 @@ requests~=2.31.0
 bs4~=0.0.1
 beautifulsoup4~=4.12.2
 pandas~=2.1.0
-selenium~=3.141.0
+selenium~=4.12.0
 flask~=2.3.3
 setuptools~=68.0.0
 streamlit~=1.26.0
-openpyxl
+openpyxl~=3.1.2
 streamlit-option-menu
-plotly
-matplotlib
+plotly~=5.9.0
+matplotlib~=3.7.2
 ipywidgets
-mysql
+mysql~=0.0.3
 --user mysql-connector-python
+sqlalchemy~=2.0.20
+numpy~=1.23.5
+pymysql

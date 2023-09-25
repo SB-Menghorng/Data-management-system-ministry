@@ -2,7 +2,13 @@
 {% block title %} Ministry of Data Collection {% endblock %}
 {% block content %}
  <div id="download-status" style="display: none;"></div>
-<main xmlns="http://www.w3.org/1999/html">
+<!--  <div class="header">-->
+<!--      <h3>download data</h3>-->
+<!--      <p>-->
+<!--        Paragraphs are the building blocks of papers. Many students define paragraphs in terms of length: a paragraph is a group of at least five sentences, a paragraph is half a page long, etc. In reality, though, the unity and coherence of ide-->
+<!--      </p>-->
+<!--    </div>-->
+<div class="main" xmlns="http://www.w3.org/1999/html">
   <div class="block">
     <h2>Domestic Data</h2>
     <form action="{{ url_for('process_form') }}" method="POST">
@@ -35,7 +41,8 @@
         <option value="website4"> Export by Sri Lanka</option>
         <option value="website5">China-Exchange Rate</option>
         <option value="website6">Asian Development Bank(GDP)</option>
-        <option value="website7">BanglasDesh-Exchange Rate</option>
+        <option value="website7">BanglasDesh-Exchange Rate</option>\
+        <option value="website8">Inflation Rate</option>
       </select>
     </div>
     <div class="website">
@@ -65,7 +72,7 @@
     </div>
     </form>
   </div>
-</main>
+</div>
 <nav class="secondary-navigation">
   <p>Copyright © by 2012 - 2023 Ministry of Labour and Vocational Training.</p>
 </nav>

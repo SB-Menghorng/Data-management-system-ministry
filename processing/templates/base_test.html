@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %}
+
+        {% endblock %}
+    </title>
+        {% block css %}
+        {% endblock %}
+</head>
+<body>
+    <div class="sidenav">
+        <a href="#">Home</a>
+        <a href="#">Database</a>
+        <a href="#">Dashboard</a>
+    </div>
+    <div class="main-content">
+        <div class="header">
+
+            <h3>Ministry of Data Collection</h3>
+        </div>
+            {% block content %}
+
+            {% endblock %}
+    </div>
+</body>
+</html>

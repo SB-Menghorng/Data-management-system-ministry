@@ -11,7 +11,44 @@ url = 'https://nsdp.gso.gov.vn/index.htm'
 
 
 class Scraper(webdriver.Chrome):
-    def __init__(self, destination_dir, driver=driver_path, teardown=False):
+    """
+   The `Scraper` class provides methods for web scraping a specific website using Selenium.
+
+   Attributes:
+       driver_path (str): The path to the Chrome WebDriver executable.
+       teardown (bool): Whether to quit the WebDriver on exit.
+
+   Methods:
+       get_xml(self):
+           Scrapes the website to extract XML download links.
+
+       extract_file(self, option, indicator):
+           Extracts data from an XML file and processes it based on the selected option and indicator.
+
+       database_connection(self, option=None, indicator=None, create_table=True, table_show=False, delete_table=False, insert_data=False):
+           Stores extracted data in a database table with optional table management operations.
+
+   Use Case:
+       The `Scraper` class simplifies web scraping tasks using Selenium and facilitates data extraction,
+       processing, and database storage.
+
+   Example Usage:
+       # Create a Scraper object
+       scraper = Scraper(driver_path='chromedriver.exe', teardown=True)
+
+       # Get XML download links from the website
+       xml_data = scraper.get_xml()
+
+       # Extract and process data from the XML file
+       data_option = 'Consumer Price Index'
+       data_indicator = 'PCPICO_PC_PP_PT'
+       extracted_data = scraper.extract_file(option=data_option, indicator=data_indicator)
+
+       # Store data in a database table
+       scraper.database_connection(option=data_option, indicator=data_indicator, create_table=True)
+   """
+
+    def __init__(self, driver=driver_path, teardown=False):
         """
        Initializes a web scraper using Selenium for a specific website.
 
@@ -26,9 +63,6 @@ class Scraper(webdriver.Chrome):
         self.driver_path = driver
         self.teardown = teardown
         chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_experimental_option("prefs", {
-            "download.default_directory": destination_dir
-        })
         super(Scraper, self).__init__(executable_path=driver, options=chrome_options)
         self.implicitly_wait(2)
         self.maximize_window()
@@ -116,12 +150,32 @@ class Scraper(webdriver.Chrome):
             elif indicator == 'PCPICO_PC_PP_PT':
                 df1 = df[df['INDICATOR'] == 'PCPICO_PC_PP_PT'].copy()
                 df1.rename(columns={'OBS_VALUE': 'Inflation Rate'}, inplace=True)
-                return df1
+                df1['Status'] = ['Real'] * df1.shape[0]
+                df1['Month'] = df1['TIME_PERIOD'].dt.month
+                df1['Year'] = df1['TIME_PERIOD'].dt.year
+                months = {1: 'January',
+                          2: 'February',
+                          3: 'March',
+                          4: 'April',
+                          5: 'May',
+                          6: 'June',
+                          7: 'July',
+                          8: 'August',
+                          9: 'September',
+                          10: 'October',
+                          11: 'November',
+                          12: 'December'}
+                df1['Month'] = df1['Month'].map(months)
+                df1['Value'] = df1['Inflation Rate']
+                df1['Note'] = df[df['INDICATOR'] == 'PCPI_IX']['BASE_PER'].iloc[:df1.shape[0]].values
+                df1.rename(columns={'PublishDate': 'Publish Date'}, inplace=True)
+                return df1[['Country', 'Source', 'Update frequency', 'Status', 'Year', 'Month', 'Value', 'Publish Date',
+                            'Link', 'Note']]
         else:
             print("The option haven't develop yet")
 
-    def store_database(self, option='Consumer Price Index', indicator='PCPICO_PC_PP_PT', create_table=True,
-                       delete_table=False):
+    def database_connection(self, option=None, indicator=None, create_table=True,
+                            table_show=False, delete_table=False, insert_data=False):
         """
        Stores extracted data in a database table.
 
@@ -137,23 +191,34 @@ class Scraper(webdriver.Chrome):
        This method stores the extracted data in a database table with optional table management operations.
        It returns True if the data insertion is successful, or False if there was an issue.
        """
+        if option is None:
+            option = 'Consumer Price Index'
+        if indicator is None:
+            indicator = 'PCPICO_PC_PP_PT'
         db = Database(host, password, user, table=your_table_name, database=database_name)
 
-        df = self.extract_file(option, indicator)
         if create_table:
-            db.create_table(your_table_name)
+            db.create_table()
+        elif table_show:
+            db.show_table()
         elif delete_table:
             db.delete_table()
-
-        db.insert_data(df, InflationRate='Inflation Rate', TimePeriod='TIME_PERIOD', Country='Vietnam',
-                       Status='Observation', PublishDate='2023-08-29',
-                       links='https://nsdp.gso.gov.vn/index.htm',
-                       note_value='2019')
+        elif insert_data:
+            df = self.extract_file(option, indicator)
+            db.insert_data(df)
 
 
 # Example usage:
-# dir_store = r"D:\Intership\Labour ministry of combodain\demo"
-# scraper = Scraper(destination_dir=dir_store, teardown=True)
-# df = scraper.extract_file('Consumer Price Index', 'PCPICO_PC_PP_PT')
-# scraper.store_database('Consumer Price Index', 'PCPICO_PC_PP_PT', create_table=True, delete_table=False)
-# print(df)
+def main(option=None, indicator=None, create_table=True,
+         table_show=False, delete_table=False, insert_data=False):
+
+    if option is None:
+        option = 'Consumer Price Index'
+    if indicator is None:
+        indicator = 'PCPICO_PC_PP_PT'
+
+    scraper = Scraper(teardown=True)
+    df = scraper.extract_file(option=option, indicator=indicator)
+    # scraper.database_connection(option, indicator, create_table,
+    #                             table_show, delete_table, insert_data)
+    return df

@@ -4,7 +4,6 @@ import pandas as pd
 
 
 def extract_xml(url):
-
     """
     Extracts data from an XML file hosted at the given URL and returns it as a Pandas DataFrame.
 
@@ -72,6 +71,8 @@ def extract_xml(url):
     PublishDate = []
     Country = []
     link = []
+    source = []
+    update_fq = []
 
     for series in series_elements:
         # Here, you can access and manipulate each <Series> element as needed
@@ -98,10 +99,13 @@ def extract_xml(url):
             PublishDate.append(header)
             Country.append('Vietname')
             link.append('https://nsdp.gso.gov.vn/index.htm')
+            source.append('GENERAL STATISTICS OFFICE')
+            update_fq.append('Monthly')
 
     # Create a Pandas DataFrame from the extracted data
-    data = {'Country': Country, 'DATA_DOMAIN': domains, 'PublishDate': PublishDate, 'BASE_PER': base_pers,
-            'INDICATOR': indicators, 'TIME_PERIOD': time_periods, 'OBS_VALUE': obs_values, 'Link': link}
+    data = {'Source': source, 'Update frequency': update_fq, 'Country': Country, 'DATA_DOMAIN': domains,
+            'PublishDate': PublishDate, 'BASE_PER': base_pers, 'INDICATOR': indicators, 'TIME_PERIOD': time_periods,
+            'OBS_VALUE': obs_values, 'Link': link}
     df = pd.DataFrame(data)
 
     # Convert the 'Date' column to datetime
@@ -142,8 +146,9 @@ def extract_xml(url):
                   'PCPICO_BY_CP_A_PT': 'Core CPI ( Y/Y % Change)'}
 
     df['Descriptor'] = df['INDICATOR'].map(Descriptor)
-    df = df[['Country', 'DATA_DOMAIN', 'PublishDate', 'BASE_PER', 'Descriptor', 'INDICATOR', 'TIME_PERIOD', 'OBS_VALUE',
-             'Link']]
+    df = df[
+        ['Country', 'DATA_DOMAIN', 'Source', 'Update frequency', 'PublishDate', 'BASE_PER', 'Descriptor', 'INDICATOR',
+         'TIME_PERIOD', 'OBS_VALUE', 'Link']]
 
     # Print the DataFrame
     return df

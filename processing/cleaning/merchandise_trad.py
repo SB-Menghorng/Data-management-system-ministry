@@ -15,7 +15,7 @@ def clean_3(Input_file, dir_for_csv):
     dir_store_csv = os.path.join(dir_for_csv, Input_file.split('.')[0] + '-clean')
     os.makedirs(dir_store_csv, exist_ok=True)
 
-    df.to_csv(csv_filename, index=False)
+    # df.to_csv(csv_filename, index=False)
 
     return csv_filename
 

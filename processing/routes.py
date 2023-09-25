@@ -16,6 +16,27 @@ streamlit_process = None
 
 # Function to start the Streamlit process in a separate thread
 def start_streamlit():
+    """
+    Function to start a Streamlit application in a separate thread.
+
+    This function manages the execution of a Streamlit application, ensuring that it is started as a subprocess,
+    capturing its standard output and error streams, handling errors, and preventing multiple instances from running
+    simultaneously.
+
+    Parameters:
+        None
+
+    Global Variables Used:
+        - streamlit_process: A global variable to store the process object representing the Streamlit application.
+
+    Returns:
+        None
+
+    Example Usage:
+        if __name__ == "__main__":
+            psf = "path_to_streamlit_app.py"  # Replace with the actual path to your Streamlit app
+            start_streamlit()
+    """
     global streamlit_process
 
     # Check if a Streamlit process is already running
@@ -44,6 +65,22 @@ def start_streamlit():
 @app.route('/')
 @app.route('/home_page')
 def home_page():
+    """
+   Route function for the home page.
+
+   This function defines a route to the home page of a web application. It performs the following actions:
+   - Starts a Streamlit application in a separate thread using the `start_streamlit()` function.
+   - The Streamlit application is launched as a separate thread to prevent blocking the main web application.
+   - The thread is given a 3-second timeout to ensure it has enough time to start.
+   - Clears the user's session data.
+   - Renders the 'home.html' template to display the home page of the web application.
+
+   Parameters:
+       None
+
+   Returns:
+       Flask response: Returns the rendered 'home.html' template as the home page of the web application.
+   """
     # Start the Streamlit process in a separate thread
     streamlit_thread = threading.Thread(target=start_streamlit)
     streamlit_thread.start()
@@ -54,6 +91,22 @@ def home_page():
 
 
 def responding(func):
+    """
+    Helper function for generating response messages.
+
+    This function takes a function `func` as input and attempts to execute it. If `func` runs successfully,
+    it returns a success message with a 'status' of 'success' and a 'message' indicating success. If `func` raises
+    an exception, it returns an error message with a 'status' of 'error' and a 'message' containing details of the error.
+
+    Parameters:
+        func (function): The function to be executed.
+
+    Returns:
+        dict: A dictionary containing the response status ('status') and message ('message').
+
+    Example Usage:
+        response = responding(some_function)
+    """
     try:
         func
         responses = {'status': 'success', 'message': 'Data download successful!'}
@@ -70,6 +123,26 @@ category, path, choice = None, None, None
 
 @app.route('/process_form', methods=['POST'])
 def process_form():
+    """
+    Route function to process the form submission.
+
+    This function handles the submission of a web form and performs the following actions:
+    - Determines the category of the form submission (domestic or international).
+    - Retrieves user input based on the category.
+    - Calls the appropriate data scraping function based on user input.
+    - Generates a response message using the 'responding()' function to indicate success or failure.
+    - Stores category, path, and choice in the Flask session.
+    - Renders the 'home.html' template, providing the response message.
+
+    Parameters:
+        None
+
+    Returns:
+        Flask response: Returns the rendered 'home.html' template with the response message.
+
+    Example Usage:
+        This function is invoked when a POST request is made to the '/process_form' route.
+    """
     global category, path, choice, response
     if 'download_button_domestic' in request.form:
         category = 'domestic'
@@ -78,10 +151,6 @@ def process_form():
         path = request.form.get('location')
         choice = request.form.get('category-domestic')  # Use 'category-download' for domestic data
         website = request.form.get('domestic-websites')
-
-        # # Write data to a shared file
-        # with open('shared_data.txt', 'w') as file:
-        #     file.write(f'{category},{path},{choice}')
 
         if website == 'website1':
             response = responding(DomesticData.GDP(path, choice).scrap_GDP_Choice())
@@ -131,9 +200,30 @@ def process_form():
 
 @app.route('/streamlit')
 def streamlit_page():
+    """
+    Route function for the Streamlit page.
+
+    This function defines a route to a Streamlit page within a web application. It performs the following actions:
+    - Retrieves data from the Flask session, specifically the 'category', 'path', and 'choice' variables.
+    - Renders the 'streamlit.html' template, providing the retrieved data as template variables for display on the page.
+
+    Parameters:
+        None
+
+    Returns:
+        Flask response: Returns the rendered 'streamlit.html' template with category, path, and choice variables.
+
+    Example Usage:
+        This function is invoked when a GET request is made to the '/streamlit' route.
+    """
     # Retrieve data from Flask session
     category = session.get('category')
     path = session.get('path')
     choice = session.get('choice')
 
     return render_template('streamlit.html', category=category, path=path, choice=choice)
+
+
+@app.route('/testing')
+def testing():
+    return render_template('test.html')

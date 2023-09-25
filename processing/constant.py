@@ -1,5 +1,7 @@
 ## Interface
 # Put your current path directory here for assets folder.
+from sqlalchemy import create_engine
+
 static_folder = r"D:\Intership\Labour ministry of combodain\system\processing\templates\assets"
 
 ## Scraping
@@ -23,3 +25,6 @@ user = 'root'
 password = 'menghorng'
 database_name = 'Economic'
 your_table_name = 'Inflation'
+
+engine = create_engine(url=f"mysql+mysqlconnector://{user}:{password}@{host}/{database_name}", pool_recycle=3600)
+
