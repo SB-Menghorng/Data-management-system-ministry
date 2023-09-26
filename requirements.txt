@@ -17,3 +17,5 @@ mysql~=0.0.3
 sqlalchemy~=2.0.20
 numpy~=1.23.5
 pymysql
+xlrd >= 2.0.1
+xlsxwriter

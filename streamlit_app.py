@@ -7,6 +7,7 @@ from processing.visualizations.test import main
 from processing.visualizations.merchandise_visualizing import dom_merchandise
 import streamlit as st
 from processing.visualizations.dashborad import dashboard1
+from processing.visualizations.Inflation_Rate.Dashboard import Dashboard
 
 if __name__ == "__main__":
 
@@ -72,6 +73,6 @@ if __name__ == "__main__":
             st.write("Please upload a CSV file to generate a data profile report.")
 
         elif option == "Dashboard 2":
-            main()
+            Dashboard()
         elif option == "Dashboard 3":
             visualize_economic_data()

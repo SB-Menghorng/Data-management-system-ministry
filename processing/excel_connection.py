@@ -30,8 +30,7 @@ class Excel:
         external_data = pd.read_excel('new_data.xlsx')
         excel.update_excel_with_row_level_validation(external_data, columns_to_verify=['Title', 'Country', 'Indicator'])
 
-        # Delete rows based on conditions
-        conditions = [(1, 'Value1'), (2, 'Value2')]
+        # Delete rows based on conditions  = [(1, 'Value1'), (2, 'Value2')]
         excel.delete_rows_from_excel_multiple_conditions(conditions)
     """
     def __init__(self, excel_file, sheet_name):
@@ -153,3 +152,5 @@ class Excel:
         except Exception as e:
             print(f"An error occurred: {str(e)}")
 
+    def show_excel(self):
+        return pd.read_excel(self.excel_file, sheet_name=self.sheet_name)

@@ -149,7 +149,7 @@ class Scraper(webdriver.Chrome):
                 return df[df['INDICATOR'] == indicator]
             elif indicator == 'PCPICO_PC_PP_PT':
                 df1 = df[df['INDICATOR'] == 'PCPICO_PC_PP_PT'].copy()
-                df1.rename(columns={'OBS_VALUE': 'Inflation Rate'}, inplace=True)
+                df1.rename(columns={'OBS_VALUE': 'Value'}, inplace=True)
                 df1['Status'] = ['Real'] * df1.shape[0]
                 df1['Month'] = df1['TIME_PERIOD'].dt.month
                 df1['Year'] = df1['TIME_PERIOD'].dt.year
@@ -166,7 +166,6 @@ class Scraper(webdriver.Chrome):
                           11: 'November',
                           12: 'December'}
                 df1['Month'] = df1['Month'].map(months)
-                df1['Value'] = df1['Inflation Rate']
                 df1['Note'] = df[df['INDICATOR'] == 'PCPI_IX']['BASE_PER'].iloc[:df1.shape[0]].values
                 df1.rename(columns={'PublishDate': 'Publish Date'}, inplace=True)
                 return df1[['Country', 'Source', 'Update frequency', 'Status', 'Year', 'Month', 'Value', 'Publish Date',
@@ -177,48 +176,66 @@ class Scraper(webdriver.Chrome):
     def database_connection(self, option=None, indicator=None, create_table=True,
                             table_show=False, delete_table=False, insert_data=False):
         """
-       Stores extracted data in a database table.
+        Perform database operations based on the specified parameters.
 
-       Parameters:
-       option (str): The selected data option.
-       indicator (str): The selected data indicator.
-       create_table (bool): Whether to create a new table in the database.
-       delete_table (bool): Whether to delete the existing table in the database.
+        Parameters:
+        option (str): The selected data option.
+        indicator (str): The selected data indicator.
+        create_table (bool): Whether to create a new table in the database.
+        delete_table (bool): Whether to delete the existing table in the database.
+        insert_data (bool): Whether to insert data into the database.
+        table_show (bool): Whether to display the database table.
 
-       Returns:
-       bool: True if the data was successfully inserted into the database, False otherwise.
+        Returns:
+        bool: True if the data was successfully inserted into the database, False otherwise.
 
-       This method stores the extracted data in a database table with optional table management operations.
-       It returns True if the data insertion is successful, or False if there was an issue.
-       """
+        This method performs various database operations based on the provided parameters.
+        It returns True if data insertion is successful or False if there was an issue.
+        """
+
+        # Set default values if parameters are not provided
         if option is None:
             option = 'Consumer Price Index'
         if indicator is None:
             indicator = 'PCPICO_PC_PP_PT'
+
+        # Create a Database instance
         db = Database(host, password, user, table=your_table_name, database=database_name)
 
+        # Create a new table in the database if requested
         if create_table:
             db.create_table()
-        elif table_show:
-            db.show_table()
-        elif delete_table:
+
+        # Delete the existing table in the database if requested
+        if delete_table:
             db.delete_table()
-        elif insert_data:
+
+        # Insert data into the database if requested
+        if insert_data:
             df = self.extract_file(option, indicator)
             db.insert_data(df)
 
+        # Show the database table if requested
+        if table_show:
+            db.show_table()
 
-# Example usage:
+        # Return True if data insertion is successful
+        return True
+
+
 def main(option=None, indicator=None, create_table=True,
          table_show=False, delete_table=False, insert_data=False):
-
     if option is None:
         option = 'Consumer Price Index'
     if indicator is None:
         indicator = 'PCPICO_PC_PP_PT'
 
     scraper = Scraper(teardown=True)
-    df = scraper.extract_file(option=option, indicator=indicator)
-    # scraper.database_connection(option, indicator, create_table,
-    #                             table_show, delete_table, insert_data)
-    return df
+    try:
+        if scraper.database_connection(option=option, indicator=indicator, create_table=create_table,
+                                       table_show=table_show, delete_table=delete_table, insert_data=insert_data):
+            print('Successfully!')
+        else:
+            print('Something wrong')
+    except Exception as e:
+        print('Error', e)

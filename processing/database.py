@@ -76,12 +76,14 @@ class Database:
         CREATE TABLE IF NOT EXISTS {table_name} (
             No INT AUTO_INCREMENT PRIMARY KEY,
             Country VARCHAR(255),
+            Source VARCHAR(255),
+            UpdateFrequency VARCHAR(255),
             Status VARCHAR(255),
             Year INT,
             Month  VARCHAR(255),
             Value FLOAT,
             AccessDate DATETIME,
-            PublishDate DATE,
+            PublishDate DATE NULL DEFAULT NULL,
             Link VARCHAR(255),
             Note VARCHAR(255)
         )
@@ -100,14 +102,7 @@ class Database:
         Insert data from a DataFrame into a MySQL table.
 
         Args:
-            df (pandas.DataFrame): The DataFrame containing the data to be inserted.
-            InflationRate (str): The column name for the inflation rate in the DataFrame.
-            TimePeriod (str): The column name for the time period in the DataFrame.
-            Country (str): The column name for the country in the DataFrame.
-            Status (str): The column name for the status in the DataFrame.
-            PublishDate (str): The column name for the publishing date in the DataFrame.
-            links (str): The column name for the links in the DataFrame.
-
+            df (pandas.DataFrame): The DataFrame containing the data to be inserted
         """
         mydb, cursor = self.connection()
 
@@ -119,6 +114,8 @@ class Database:
         try:
             # Iterate through the DataFrame and insert values into the table
             for index, row in df.iterrows():
+
+                publish_date = row['Publish Date'] if not pd.isna(row['Publish Date']) else pd.to_datetime(0).date()
                 # Handle NaN values in the 'Values' column
                 inflation_values = row["Value"] if not pd.isna(row["Value"]) else 0
 
@@ -133,10 +130,12 @@ class Database:
 
                 if count == 0:
                     insert_query = f"""
-                    INSERT INTO {table_name} (Country, Source, UpdateFrequency, Status, Year, Month, Value, AccessDate, PublishDate, Link, Note)
-                    VALUES ('{row['Country']}','{row['Source']}', '{row['Update frequency']}', '{row['Status']}', '{row['Year']}', '{row['Month']}',
-                            {inflation_values}, NOW(), '{row['Publish Date']}', '{row['Link']}', '{row['Note']}')
-                    """
+                             INSERT INTO {table_name} (Country, Source, UpdateFrequency, Status, Year, Month, Value, 
+                             AccessDate, PublishDate, Link, Note) VALUES ( '{row['Country']}', '{row['Source']}',
+                              '{row['Update frequency']}','{row['Status']}', '{row['Year']}', '{row['Month']}',
+                             '{inflation_values}',NOW(), '{publish_date}', '{row['Link']}', '{row['Note']}')
+                             """
+
                     cursor.execute(insert_query)
                     inserted_count += 1
                 else:
@@ -217,8 +216,7 @@ class Database:
             cursor.close()
             mydb.close()
 
-    def read_database(self, your_condition, Source, Indicator, UpdateFrequency='Monthly', unit='index',
-                      title='Inflation rate'):
+    def read_database(self, your_condition, Indicator='Inflation', unit='percentage', title='Inflation rate'):
 
         your_table = self.table
 
@@ -240,12 +238,12 @@ class Database:
                     'Link (if available)', 'Note', 'Note.1']
 
         df.rename(columns={'No': 'No.', 'AccessDate': 'Access Date', 'PublishDate': 'Publish Date',
-                           'Link': 'Link (if available)'}, inplace=True)
+                           'Link': 'Link (if available)', 'UpdateFrequency': 'Update frequency'}, inplace=True)
 
         missing_cols = [col for col in base_col if col not in df.columns]
         nrow = df.shape[0]
         for i, col in enumerate(missing_cols):
             df[col] = \
-                [[title] * nrow, [Source] * nrow, [UpdateFrequency] * nrow, [Indicator] * nrow, ['.'] * nrow,
+                [[title] * nrow, [Indicator] * nrow, ['.'] * nrow,
                  ['.'] * nrow, ['.'] * nrow, ['.'] * nrow, ['.'] * nrow, ['.'] * nrow, [unit] * nrow, [None] * nrow][i]
         return df[base_col]

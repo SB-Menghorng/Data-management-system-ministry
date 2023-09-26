@@ -1,6 +1,5 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 import time
@@ -16,12 +15,18 @@ from processing.constant import user, your_table_name, database_name, host, pass
 
 
 def waiting2(remaining_time):
-    '''
-    :param `remaining_time`: defines the maximum of time to waiting for the new page.
-    '''
+    """
+    Wait for a specified amount of time while displaying countdown messages.
+
+    Parameters:
+    remaining_time (int): The maximum time to wait for a new page.
+
+    This function waits for the specified amount of time while displaying countdown messages.
+    It prints "Waiting..." when 5 seconds are remaining, counts down from 5 to 1, and prints "Passed ✅" when the waiting is complete.
+    """
     while remaining_time > 0:
         if remaining_time == 5:
-            print(f"Waiting...", end=" ")
+            print("Waiting...", end=" ")
         if remaining_time <= 5:
             print(" " + str(remaining_time) + "... ", end='')
         if remaining_time == 1:
@@ -31,9 +36,9 @@ def waiting2(remaining_time):
 
 
 def initialize_webdriver():
-    '''
+    """
     :return: `driver`: a variable defines the value which is retrieve from Chrome Service.
-    '''
+    """
 
     # Set up Chrome options for headless mode
     chrome_options = Options()
@@ -46,10 +51,10 @@ def initialize_webdriver():
 
 
 def current_time():
-    '''
+    """
     :return: `formatted_date_time`: represented time of access date.
              `filename_date` (Optional): use with `pandas.to_csv()` for naming filename.
-    '''
+    """
     # Get current date and time
     now = datetime.now()
     formatted_date_time = now.strftime("%Y-%m-%d %H:%M:%S")
@@ -217,14 +222,14 @@ def store_in_database(
 
 
 def dataframe(your_db_table, your_db_condition):
-    '''
+    """
     We use `SQLAlchemy` to access the data from Database into DataFrame.
     TODO:
         - Open up the terminal or cmd (Command Prompt)
             `pip install sqlalchemy`
 
     :return: `df`: DataFrame from MySQL Database.
-    '''
+    """
     conn = engine.connect()
 
     query = text(f"SELECT * FROM {your_db_table} WHERE {your_db_condition};")
@@ -237,17 +242,17 @@ def dataframe(your_db_table, your_db_condition):
 
     df = pd.DataFrame(result.fetchall(), columns=columns)
 
-    path = "/Users/mac/Desktop/MoLVC Internship/Data-management-system-ministry/processing/scrape/IndoInflation/DB_Data/"
-    filename = "IndoInfDB.xlsx"
-    file_path = path + filename
-    try:
-        df.to_excel(os.path.join(path, filename), index=False)
-        if os.path.exists(file_path):
-            print(f"\nData saved at `{file_path}`\n")
-    except Exception as e:
-        print(f"\nAn error occurred while saving the data: {str(e)}\n")
-
-    conn.close()
+    # path = r"/Users/mac/Desktop/MoLVC Internship/Data-management-system-ministry/processing/scrape/IndoInflation/DB_Data/"
+    # filename = "IndoInfDB.xlsx"
+    # file_path = path + filename
+    # try:
+    #     df.to_excel(os.path.join(path, filename), index=False)
+    #     if os.path.exists(file_path):
+    #         print(f"\nData saved at `{file_path}`\n")
+    # except Exception as e:
+    #     print(f"\nAn error occurred while saving the data: {str(e)}\n")
+    #
+    # conn.close()
     return df
 
 
@@ -361,7 +366,3 @@ def main():
 
     # Quit driver
     driver.quit()
-
-
-if __name__ == "__main__":
-    main()

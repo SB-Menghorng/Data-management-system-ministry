@@ -195,7 +195,7 @@ def process_form():
     session['choice'] = choice
 
     # Handle other form submissions or render the page as needed
-    return render_template('home.html', response=response)
+    return render_template("home.html", response=response)
 
 
 @app.route('/streamlit')
@@ -217,11 +217,11 @@ def streamlit_page():
         This function is invoked when a GET request is made to the '/streamlit' route.
     """
     # Retrieve data from Flask session
-    category = session.get('category')
-    path = session.get('path')
-    choice = session.get('choice')
+    categories = session.get('category')
+    destination = session.get('path')
+    options = session.get('choice')
 
-    return render_template('streamlit.html', category=category, path=path, choice=choice)
+    return render_template('streamlit.html', category=categories, path=destination, choice=options)
 
 
 @app.route('/testing')

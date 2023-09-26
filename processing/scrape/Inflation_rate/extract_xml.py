@@ -49,7 +49,7 @@ def extract_xml(url):
     # def find_elements(namespace, tag):
     #     return root.findall(".//{%(namespace)s}%(tag)s" % {'namespace': namespaces[namespace], 'tag': tag})
 
-    header = find_element('message', 'Prepared').text.split('T')[0]
+    date_publish = pd.to_datetime(find_element('message', 'Prepared').text.split('T')[0])
 
     # # Example: Extract the COMMENT attribute from the DataSet element
     dataset = find_element('message', 'DataSet')
@@ -78,11 +78,8 @@ def extract_xml(url):
         # Here, you can access and manipulate each <Series> element as needed
         # For example, you can extract attributes or child elements from each series.
         data_domain = series.get('DATA_DOMAIN')
-        ref_area = series.get('REF_AREA')
         indicator = series.get('INDICATOR')
         base_per = series.get('BASE_PER')
-
-        #     print(f"Series: Data Domain={data_domain}, Ref Area={ref_area}, Indicator={indicator}")
 
         # Iterate through <Obs> elements within the <Series>
         for obs_element in series.findall(".//Obs"):
@@ -96,8 +93,8 @@ def extract_xml(url):
             # Append data to lists
             time_periods.append(time_period)
             obs_values.append(obs_value)
-            PublishDate.append(header)
-            Country.append('Vietname')
+            PublishDate.append(date_publish)
+            Country.append('Vietnam')
             link.append('https://nsdp.gso.gov.vn/index.htm')
             source.append('GENERAL STATISTICS OFFICE')
             update_fq.append('Monthly')
@@ -110,7 +107,7 @@ def extract_xml(url):
 
     # Convert the 'Date' column to datetime
     df['TIME_PERIOD'] = pd.to_datetime(df['TIME_PERIOD'], format='%Y-%m', errors='coerce')
-    df['PublishDate'] = pd.to_datetime(df['PublishDate'], format='%Y-%m', errors='coerce')
+    # df['PublishDate'] = pd.to_datetime(df['PublishDate'], format='%Y-%m', errors='coerce')
 
     Descriptor = {'PCPI_IX': 'Consumer Price Index, Index ',
                   'PCPI_CP_01_IX': 'Food and Foodstuffs, Index ',
@@ -146,9 +143,10 @@ def extract_xml(url):
                   'PCPICO_BY_CP_A_PT': 'Core CPI ( Y/Y % Change)'}
 
     df['Descriptor'] = df['INDICATOR'].map(Descriptor)
-    df = df[
-        ['Country', 'DATA_DOMAIN', 'Source', 'Update frequency', 'PublishDate', 'BASE_PER', 'Descriptor', 'INDICATOR',
-         'TIME_PERIOD', 'OBS_VALUE', 'Link']]
+    df = df[['Country', 'DATA_DOMAIN', 'Source', 'Update frequency', 'PublishDate', 'BASE_PER', 'Descriptor',
+             'INDICATOR', 'TIME_PERIOD', 'OBS_VALUE', 'Link']]
 
     # Print the DataFrame
     return df
+
+
