@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const additionalInfoInternational2 = document.getElementById("additionalInfoInternational2");
     const internationalCategory = document.getElementById("internationalCategory");
     const domesticCategory = document.getElementById("domesticCategory");
+    const element = document.getElementById("inputdir");
+
 
     // Define category options for different websites
     const websiteCategoryOptions = {
@@ -67,7 +69,13 @@ document.addEventListener("DOMContentLoaded", function() {
             showAdditionalInfo(additionalInfoInternational2);
             hideAdditionalInfo(additionalInfoInternational1);
             hideAdditionalInfo(additionalInfoInternational);
-        } else {
+        } else if (this.value === "website8"){
+            hideAdditionalInfo(additionalInfoInternational);
+            hideAdditionalInfo(additionalInfoInternational1);
+            hideAdditionalInfo(additionalInfoInternational2);
+            // hideAdditionalInfo(element);
+        }
+        else {
             hideAdditionalInfo(additionalInfoInternational);
             hideAdditionalInfo(additionalInfoInternational1);
             hideAdditionalInfo(additionalInfoInternational2);

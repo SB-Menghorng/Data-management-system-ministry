@@ -33,6 +33,7 @@ class Excel:
         # Delete rows based on conditions  = [(1, 'Value1'), (2, 'Value2')]
         excel.delete_rows_from_excel_multiple_conditions(conditions)
     """
+
     def __init__(self, excel_file, sheet_name):
         """
         Initialize an Excel object for updating an existing Excel file.
@@ -47,67 +48,66 @@ class Excel:
         self.excel_file = excel_file
         self.sheet_name = sheet_name
 
-    def update_excel_with_row_level_validation(self, external_data, columns_to_verify=None):
+    def insert_into_existing_excel(self, df, existing_excel=None, sheet_name=None, verify_cols=None):
         """
-        Update an existing Excel file with row-level validation for specified columns.
+        Inserts data from a given DataFrame into an existing Excel file and specified sheet, while handling duplicates and providing feedback.
 
         Parameters:
-        - external_data (pd.DataFrame): The DataFrame containing the data to append.
-        - columns_to_verify (list): A list of column names to verify for duplicates.
+            df (pandas.DataFrame): The DataFrame containing data to be inserted.
+            existing_excel (str): The path to the existing Excel file.
+            sheet_name (str): The name of the sheet within the Excel file to insert data into.
+            verify_cols (list): A list of column names used to identify duplicates.
 
         Returns:
-        - None
+            None
+
+        The function reads the existing Excel file specified by 'existing_excel' and the sheet specified by 'sheet_name'. It then checks and enforces data type compatibility between the input DataFrame 'df' and the existing sheet. The 'verify_cols' parameter is used to identify duplicate rows based on specific columns.
+
+        The function counts and prints the number of duplicate rows found in 'df' compared to the existing sheet. It filters 'df' to retain only non-duplicate rows.
+
+        The non-duplicate rows are combined with the existing Excel data, and a 'No.' column is added for row numbering, starting from 1.
+
+        The function appends the combined data to the specified sheet in the existing Excel file.
+
+        If the insertion is successful, the function prints a success message along with the number of rows inserted.
         """
-        if columns_to_verify is None:
-            columns_to_verify = ['Title', 'Country', 'Indicator']
-        excel_file, sheet_name = self.excel_file, self.sheet_name
 
+        if existing_excel is None:
+            existing_excel = self.excel_file
+        if sheet_name is None:
+            sheet_name = self.sheet_name
+
+        if verify_cols is None:
+            verify_cols = ['Title', 'Country', 'Year', 'Month']
+        # Read the existing Excel file
         try:
-            # Load the existing Excel file
-            wb = load_workbook(excel_file)
+            df_exit = pd.read_excel(existing_excel, sheet_name=sheet_name)
+        except FileNotFoundError:
+            print(f"The Excel file '{existing_excel}' does not exist.")
+            return
+        except KeyError:
+            print(f"The sheet '{sheet_name}' does not exist in '{existing_excel}'.")
+            return
 
-            # Load existing data from Excel into a DataFrame
-            existing_data = pd.read_excel(excel_file, sheet_name=sheet_name)
+        # Ensure the data types of columns in df match those in df_exit
+        for col, dtype in df_exit.dtypes.items():
+            df[col] = df[col].astype(dtype)
 
-            # Calculate row numbers for 'No.' column
-            n = existing_data.shape[0] + external_data.shape[0]
-            no = [i for i in range(n, 0, -1)]
-            no = no[:external_data.shape[0]]
-            external_data['No.'] = no[::-1]
+        # Concatenate df_exit and df_not_duplicates_in_df_exit
+        concatenated_df = pd.concat([df_exit, df], ignore_index=True)
+        concatenated_df['No.'] = [i for i in range(1, concatenated_df.shape[0] + 1)]
 
-            # Find the last row number in the existing Excel sheet
-            last_row = existing_data.shape[0] + 2  # Add 2 to account for the header row and 1-based indexing
+        num_duplicates = concatenated_df.duplicated(subset=verify_cols).sum()
+        print(f"Number of duplicate rows: {num_duplicates}")
 
-            # Initialize a list to store duplicate rows
-            duplicate_rows = []
+        concatenated_df.drop_duplicates(subset=verify_cols, inplace=True)
+        concatenated_df['No.'] = [i for i in range(1, concatenated_df.shape[0] + 1)]
 
-            # Iterate through each row in the external data
-            for index, row in external_data.iterrows():
-                # Create a condition to check for duplicates in the existing data
-                condition = (existing_data[columns_to_verify] == row[columns_to_verify]).all(axis=1).all()
-
-                # If a duplicate is found, add the row to the list
-                if condition:
-                    duplicate_rows.append(index)
-
-            # Check if any duplicate rows were found
-            if duplicate_rows:
-                print("Duplicate rows found. Update aborted.")
-                wb.close()
-                return
-
-            # Calculate the starting row for appending data
-            start_row = last_row
-
-            # Append only new data to the Excel file starting from the last row
-            writer = pd.ExcelWriter(excel_file, engine='openpyxl')
-            writer.book = wb
-            external_data.to_excel(writer, sheet_name=sheet_name, index=False, startrow=start_row, header=False)
-            writer.save()
-            wb.close()
-            print("Excel file updated successfully.")
-        except Exception as e:
-            print(f"An error occurred: {str(e)}")
+        # Create an ExcelWriter object to write to the existing Excel file
+        with pd.ExcelWriter(existing_excel, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
+            # Write the concatenated DataFrame to the specified sheet
+            concatenated_df.to_excel(writer, sheet_name=sheet_name, index=False)
+            print('Insert successfully!', concatenated_df.shape[0] - df_exit.shape[0], 'rows')
 
     def delete_rows_from_excel_multiple_conditions(self, conditions):
         """

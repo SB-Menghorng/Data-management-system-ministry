@@ -46,7 +46,7 @@ def initialize_webdriver():
     chrome_options.add_argument("--disable-gpu")  # Disable GPU for headless mode
 
     # Create a webdriver instance using the Service object
-    driver = webdriver.Chrome(executable_path=driver_path)
+    driver = webdriver.Chrome()
     return driver
 
 
@@ -63,7 +63,7 @@ def current_time():
 
 
 def scrape_inflation_data(driver, num_pages, formatted_date_time):
-    '''
+    """
     :param `driver`:
     :param `num_pages`: amount of pages we want to scrape.
     :param `formatted_date_time`:
@@ -71,7 +71,7 @@ def scrape_inflation_data(driver, num_pages, formatted_date_time):
     :return: all return variables has type `list`, in order to use with dataframe and any further use.
         `No`. `inflation_data`, `year`, `month`, `value`, `country_val`, `source_val`, `update_frequency_val`, `status_val`,
         `access_date_val`, `publish_date_val`, `link_val`, `note_val`
-    '''
+    """
     n = 1
     No = []
     date = []  # Use to keep date
@@ -150,7 +150,7 @@ def store_in_database(
         your_host, your_user, your_password, your_database, your_db_table,
         inflation_data, year, month, value, country_val, source_val,
         update_frequency_val, status_val, access_date_val, publish_date_val, link_val, note_val):
-    '''
+    """
     All parameters here is same as the return variables from the previous function,
         `scrape_inflation_data()`.
 
@@ -168,7 +168,7 @@ def store_in_database(
     :param `note_val`:
 
     :return: `True`: `Bool`: Use to check in with DB whether it stored or not.
-    '''
+    """
 
     db_config = {
         'host': f'{your_host}',

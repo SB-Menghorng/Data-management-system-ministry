@@ -7,6 +7,8 @@ from processing.constant import thyda_dir, fltest
 import plotly.figure_factory as ff
 
 warnings.filterwarnings('ignore')
+
+
 # st.markdown(
 #     """
 #     <style>
@@ -17,12 +19,12 @@ warnings.filterwarnings('ignore')
 #     """,
 #     unsafe_allow_html=False
 # )
-
-st.set_page_config(
-    page_title="Ministry of Labour and Training!!",
-    page_icon="https://res.cloudinary.com/aquarii/image/upload/v1643955074/Ministry-of-Labour-Vocational-Training-MoLVT-2.jpg",
-    layout="wide"
-)
+#
+# st.set_page_config(
+#     page_title="Ministry of Labour and Training!!",
+#     page_icon="https://res.cloudinary.com/aquarii/image/upload/v1643955074/Ministry-of-Labour-Vocational-Training-MoLVT-2.jpg",
+#     layout="wide"
+# )
 def visualize_economic_data():
     # logo
     image_path = "https://freepngimg.com/download/technology/63583-visualization-data-illustration-png-image-high-quality.png"

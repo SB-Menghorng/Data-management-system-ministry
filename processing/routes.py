@@ -10,6 +10,8 @@ from processing.constant import psf
 from flask import render_template
 import subprocess
 
+from processing.scrape.Inflation_rate.scraper import InflationRate
+
 # Define the Streamlit process globally
 streamlit_process = None
 
@@ -58,7 +60,6 @@ def start_streamlit():
             print("Error:", e)
     else:
         print("Streamlit is already running")
-        
 
 
 # Route to the home page
@@ -188,6 +189,8 @@ def process_form():
             response = responding(scrapping.adb())
         elif website == 'website7':
             response = responding(scrapping.banglashdesh_ex_rate(input_date_str=input_date_str))
+        elif website == 'website8':
+            response = responding(InflationRate())
 
     # Store data in Flask session
     session['category'] = category

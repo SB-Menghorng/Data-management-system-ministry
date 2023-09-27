@@ -83,7 +83,7 @@ class Database:
             Month  VARCHAR(255),
             Value FLOAT,
             AccessDate DATETIME,
-            PublishDate DATE NULL DEFAULT NULL,
+            PublishDate VARCHAR(255),
             Link VARCHAR(255),
             Note VARCHAR(255)
         )
@@ -115,7 +115,7 @@ class Database:
             # Iterate through the DataFrame and insert values into the table
             for index, row in df.iterrows():
 
-                publish_date = row['Publish Date'] if not pd.isna(row['Publish Date']) else pd.to_datetime(0).date()
+                publish_date = row['Publish Date'] if not pd.isna(row['Publish Date']) else None
                 # Handle NaN values in the 'Values' column
                 inflation_values = row["Value"] if not pd.isna(row["Value"]) else 0
 

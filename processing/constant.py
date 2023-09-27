@@ -11,9 +11,14 @@ driver_path = r"D:\Intership\Labour ministry of combodain\chromedriver-win64\chr
 # Path of Streamlit file (e.g., streamlit_app.py file)
 psf = r"D:\Intership\Labour ministry of combodain\system\streamlit_app.py"
 
+# User-Agent
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36'
+}
+
 ## Visualization
 # Add the directory path for Thyda Streamlit testing
-thyda_dir = r"D:\Intership\Labour ministry of combodain\test"
+thyda_dir = r"D:\Intership\Labour ministry of combodain\test\SampleSpreadSheet.csv"
 
 # File test
 fltest = r"some_asean_and_european_currencies_against_khmer_riel_end_period.csv"

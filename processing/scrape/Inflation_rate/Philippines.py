@@ -75,4 +75,3 @@ def main():
     return df
 
 
-print(main())

@@ -19,3 +19,5 @@ numpy~=1.23.5
 pymysql
 xlrd >= 2.0.1
 xlsxwriter
+webdriver-manager
+--upgrade selenium

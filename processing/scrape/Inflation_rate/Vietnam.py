@@ -1,8 +1,10 @@
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service as ChromeService
 
-from processing.constant import driver_path, user, your_table_name, host, password, database_name
+from processing.constant import user, your_table_name, host, password, database_name
 from processing.database import Database
 from processing.scrape.Inflation_rate.extract_xml import extract_xml
 from processing.scrape.Inflation_rate import calculate
@@ -15,7 +17,6 @@ class Scraper(webdriver.Chrome):
    The `Scraper` class provides methods for web scraping a specific website using Selenium.
 
    Attributes:
-       driver_path (str): The path to the Chrome WebDriver executable.
        teardown (bool): Whether to quit the WebDriver on exit.
 
    Methods:
@@ -48,7 +49,7 @@ class Scraper(webdriver.Chrome):
        scraper.database_connection(option=data_option, indicator=data_indicator, create_table=True)
    """
 
-    def __init__(self, driver=driver_path, teardown=False):
+    def __init__(self, teardown=False):
         """
        Initializes a web scraper using Selenium for a specific website.
 
@@ -60,10 +61,10 @@ class Scraper(webdriver.Chrome):
        This class extends the webdriver.Chrome class from Selenium to facilitate web scraping.
        It sets up the WebDriver with specific options and provides methods for data extraction.
        """
-        self.driver_path = driver
+        self.service = ChromeService(ChromeDriverManager().install())
         self.teardown = teardown
         chrome_options = webdriver.ChromeOptions()
-        super(Scraper, self).__init__(executable_path=driver, options=chrome_options)
+        super(Scraper, self).__init__(options=chrome_options)
         self.implicitly_wait(2)
         self.maximize_window()
 
@@ -96,7 +97,7 @@ class Scraper(webdriver.Chrome):
         table = div.find_element(By.TAG_NAME, 'table')
         rows = table.find_elements(By.TAG_NAME, 'tr')
 
-        categories, url_xmls = [], []
+        categories, xml_urls = [], []
 
         for row in rows:
             cells = row.find_elements(By.TAG_NAME, 'td')
@@ -113,11 +114,11 @@ class Scraper(webdriver.Chrome):
                     print('url:', url_xml)  # Get the href attribute of the <a> element
 
                     categories.append(category_name)
-                    url_xmls.append(url_xml)
+                    xml_urls.append(url_xml)
 
                 except NoSuchElementException:
                     print('No <a> element found in this cell')
-        data_xml = dict(zip(categories, url_xmls))
+        data_xml = dict(zip(categories, xml_urls))
         print('rows:', len(rows))
         print('data:', data_xml)
         return data_xml
@@ -192,15 +193,15 @@ class Scraper(webdriver.Chrome):
         This method performs various database operations based on the provided parameters.
         It returns True if data insertion is successful or False if there was an issue.
         """
+        df = self.extract_file(option, indicator)
 
+        # Create a Database instance
+        db = Database(host, password, user, table=your_table_name, database=database_name)
         # Set default values if parameters are not provided
         if option is None:
             option = 'Consumer Price Index'
         if indicator is None:
             indicator = 'PCPICO_PC_PP_PT'
-
-        # Create a Database instance
-        db = Database(host, password, user, table=your_table_name, database=database_name)
 
         # Create a new table in the database if requested
         if create_table:
@@ -212,7 +213,6 @@ class Scraper(webdriver.Chrome):
 
         # Insert data into the database if requested
         if insert_data:
-            df = self.extract_file(option, indicator)
             db.insert_data(df)
 
         # Show the database table if requested
@@ -223,19 +223,4 @@ class Scraper(webdriver.Chrome):
         return True
 
 
-def main(option=None, indicator=None, create_table=True,
-         table_show=False, delete_table=False, insert_data=False):
-    if option is None:
-        option = 'Consumer Price Index'
-    if indicator is None:
-        indicator = 'PCPICO_PC_PP_PT'
 
-    scraper = Scraper(teardown=True)
-    try:
-        if scraper.database_connection(option=option, indicator=indicator, create_table=create_table,
-                                       table_show=table_show, delete_table=delete_table, insert_data=insert_data):
-            print('Successfully!')
-        else:
-            print('Something wrong')
-    except Exception as e:
-        print('Error', e)
