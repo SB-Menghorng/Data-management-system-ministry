@@ -10,6 +10,20 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/processing/scrape/IndoInflation/DB_Data/Thai.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/processing/scrape/IndoInflation/DB_Data/indonesia_inflation.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
       </map>
     </option>
   </component>
