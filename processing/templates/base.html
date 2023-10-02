@@ -8,7 +8,10 @@
 
         {% endblock %}
     </title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    {% block style %}
+
+    {% endblock %}
+    <link rel="stylesheet" href="assets/css/downloadForm.css">
 </head>
 <body>
     <header class="header">
@@ -18,14 +21,12 @@
     </header>
     <nav class="main-navigation">
         <ul class="right-nav-left">
-            <li><a>Home</a></li>
-            <li><a href="/">Download</a></li>
-            <li><a >Database</a></li>
-            <li><a href="/streamlit" id="statisticLink">Visualization</a></li>
+            <li><a href="/instruction">Home</a></li>
+            <li><a href="{{ url_for('home_page') }}">Data Collection</a></li>
+            <li><a >Databases Management</a></li>
         </ul>
         <ul class="right-nav-right">
-            <li><a href="/testing">testing</a></li>
-            <li><a href="#">Sign Up</a></li>
+            <li><a href="/streamlit" id="statisticLink">Dashboard Visualization</a></li>
         </ul>
     </nav>
     {% block content %}

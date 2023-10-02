@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="Black">
-    <option name="pathToExecutable" value="C:\Users\SOPHY\anaconda3\Scripts\black.exe" />
-    <option name="sdkUUID" value="563dd21c-84b9-4d03-b483-77eadd8509e8" />
-  </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.11" project-jdk-type="Python SDK" />
-</project>

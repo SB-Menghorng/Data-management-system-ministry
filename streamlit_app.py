@@ -8,7 +8,8 @@ from processing.visualizations.Inflation_Rate.Dashboard import Dashboard
 if __name__ == "__main__":
     st.set_page_config(
         page_title="Ministry of Labour and Vocational Training",
-        page_icon="https://res.cloudinary.com/aquarii/image/upload/v1643955074/Ministry-of-Labour-Vocational-Training-MoLVT-2.jpg",
+        page_icon="https://res.cloudinary.com/aquarii/image/upload/v1643955074/Ministry-of-Labour-Vocational-Training"
+                  "-MoLVT-2.jpg",
         layout="wide",
         initial_sidebar_state="collapsed"
         #     menu_items={
@@ -16,7 +17,6 @@ if __name__ == "__main__":
         #         'Report a bug': 'https://www.extremelycoolapp.com/bug',
         #         'About' :"This is a header. This is an *extremely* cool app!"
         # }
-
     )
 
     # read_and_delete_shared_data()

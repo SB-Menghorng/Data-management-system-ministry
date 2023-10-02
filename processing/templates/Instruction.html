@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %} Ministry of Data Management {% endblock %}
+{% block style %}
+    <link rel="stylesheet" href="assets/css/instruction.css">
+{% endblock %}
+
+{% block content %}
+    <header>
+        <h1>System Data Management Project</h1>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#description">Description</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#getting-started">Getting Started</a></li>
+            <li><a href="#usage">Usage</a></li>
+            <li><a href="#configuration">Configuration</a></li>
+            <li><a href="#running-the-application">Running the Application</a></li>
+            <li><a href="#contributing">Contributing</a></li>
+            <li><a href="#license">License</a></li>
+            <li><a href="#acknowledgments">Acknowledgments</a></li>
+        </ul>
+    </nav>
+
+    <section id="description">
+        <h2>Description</h2>
+        <p>The System Data Management is a web application designed to collect and manage data from various sources, providing users with a convenient way to access and download the data they need. This README provides an overview of the project, how to set it up, and how to use it.</p>
+    </section>
+
+    <section id="features">
+        <h2>Features</h2>
+        <ul>
+            <li>Collects and manages domestic and international data.</li>
+            <li>Supports different data categories and sources.</li>
+            <li>Provides a user-friendly interface for data selection and download.</li>
+            <li>Allows customization and extension for additional data sources.</li>
+        </ul>
+    </section>
+
+    <section id="getting-started">
+        <h2>Getting Started</h2>
+
+        <section id="prerequisites">
+            <h3>Prerequisites</h3>
+            <p>Before you begin, ensure you have met the following requirements:</p>
+            <ul>
+                <li>Python installed on your local machine.</li>
+                <li>Flask framework installed. You can install it using pip: <code>pip install flask</code></li>
+                <li>Streamlit framework installed. You can install Streamlit in your environment: <code>pip install streamlit</code></li>
+            </ul>
+        </section>
+
+        <section id="installation">
+            <h3>Installation</h3>
+            <p>Open your cmd and type:</p>
+            <code>make install</code>
+        </section>
+
+        <section id="using-make-command">
+            <h3>Using the make Command</h3>
+            <p>To execute various tasks related to your project, you can use the make command in the Windows Command Prompt (CMD). Here's how:</p>
+            <ul>
+                <li><strong>Ensure Make is Installed:</strong> Before using the make command, ensure that it's installed on your system. You can install 'make' using Chocolatey by following the provided instructions in the Installation section.</li>
+                <li><strong>Open the Command Prompt:</strong> Open the Command Prompt by pressing Win + R, typing cmd, and pressing Enter.</li>
+                <li><strong>Navigate to Your Project Directory:</strong> Use the cd command to navigate to your project directory. Replace YourUsername and the path to match your project's location:
+                    <code>cd C:\Users\YourUsername\YourProjectFolder</code>
+                </li>
+                <li><strong>Run Makefile Commands:</strong> Run Makefile commands using the make command followed by the specific target or command you want to execute. For example:
+                    <code>make install</code> The available commands and their descriptions are defined in your project's Makefile.</li>
+                <li><strong>Review Output:</strong> As you execute Makefile commands, the Command Prompt will display relevant information, including task execution details and any error messages.</li>
+                <li><strong>Exit the Command Prompt:</strong> To exit the Command Prompt, either close the window or enter: <code>exit</code></li>
+            </ul>
+        </section>
+    </section>
+
+    <!-- Other sections follow the same structure -->
+
+    <footer>
+        <p>&copy; 2023 System Data Management Project. All Rights Reserved.</p>
+    </footer>
+{% endblock %}

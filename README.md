@@ -1,4 +1,4 @@
-# Ministry of Data Collection
+# System Data Management Project 
 
 ## Table of Contents
 
@@ -17,7 +17,7 @@
 
 ## Description
 
-The **Ministry of Data Collection** is a web application designed to collect and manage data from various sources, providing users with a convenient way to access and download the data they need. This README provides an overview of the project, how to set it up, and how to use it.
+The **System Data Management** is a web application designed to collect and manage data from various sources, providing users with a convenient way to access and download the data they need. This README provides an overview of the project, how to set it up, and how to use it.
 
 ## Features
 
@@ -33,7 +33,8 @@ The **Ministry of Data Collection** is a web application designed to collect and
 Before you begin, ensure you have met the following requirements:
 
 - [Python](https://www.python.org/downloads/) installed on your local machine.
-- [Flask](https://flask.palletsprojects.com/en/2.1.x/) framework installed. You can install it using pip:
+- [Flask](https://flask.palletsprojects.com/en/2.1.x/) framework installed. You can install it using pip: `pip install flask`
+- [Streamlit](https://streamlit.io/) framework installed. You also can install Streamlit in your environment: `pip install streamlit`
 
 ### Installation
 
@@ -102,7 +103,7 @@ To run the application, follow these steps:
 2. Start the Flask development server:
 
 
-3. Access the application in your web browser at `http://localhost:5000`.
+1. Access the application in your web browser at `http://localhost:5000`.
 
 ## Contributing
 
@@ -115,13 +116,12 @@ Contributions are welcome! If you'd like to contribute to this project, please f
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Ministry License - see the [LICENSE](https://www.mlvt.gov.kh/) file for details.
 
 ## Acknowledgments
 
 - [Flask](https://flask.palletsprojects.com/en/2.1.x/) - The web framework used.
-- [Bootstrap](https://getbootstrap.com/) - Used for styling the interface.
-- [FontAwesome](https://fontawesome.com/) - Used for icons.
+- [Selenium](https://selenium-python.readthedocs.io/) - The tool for scraping data
 
 
 

@@ -1,9 +1,5 @@
 import pandas as pd
-import numpy as np
 import streamlit as st
-import plotly.express as px
-import matplotlib.pyplot as plt
-import plotly.graph_objects as go
 import datetime
 import re
 import base64
@@ -12,7 +8,7 @@ import io
 import plotly.graph_objects as go
 
 from processing.constant import thyda_dir, host, password, user, your_table_name, database_name
-from processing.database import Database
+from processing.connection.database import Database
 
 
 def plot_line_chart(data, start_date, end_date):

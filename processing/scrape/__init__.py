@@ -1,5 +1,6 @@
 import time
 
+
 def waiting():
     max_timeout = 10
     remaining_time = max_timeout

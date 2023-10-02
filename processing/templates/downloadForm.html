@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block title %} Ministry of Data Management {% endblock %}
+{% block content %}
+ <div id="download-status" style="display: none;"></div>
+<div class="main" xmlns="http://www.w3.org/1999/html">
+  <div class="block">
+    <h2>Domestic Data</h2>
+    <form action="{{ url_for('process_form') }}" method="POST">
+      <div>
+        <label for="domesticWebsite">Select Website:</label>
+        <select id="domesticWebsite" name="domestic-websites">
+          <option value="GDP">Gross domestic product (GDP)</option>
+          <option value="NBC">National Bank of Cambodia</option>
+        </select>
+      </div>
+      <div class="website">
+        <!-- Additional Info Section for Domestic Website -->
+        <div class="additional-info" id="additionalInfoDomestic"></div>
+        <label for="domesticCategory">Select categories:</label>
+        <select name="category-domestic" id="domesticCategory"></select>
+        <label for="path"></label><input name="location" type="text" placeholder="Directory to store in your computer" id="path" required>
+        <!-- Placeholder for status message -->
+      </div>
+      <button type="submit" name="download_button_domestic" id="domestic-button">Download</button>
+    </form>
+  </div>
+  <div class="block">
+    <h2>International Data</h2>
+    <form action="{{ url_for('process_form') }}" method="POST">
+  <div>
+  <label for="internationalSectors">Select sectors:</label>
+  <select id = "internationalSectors" name="International-Sectors">
+    <option value="OpecBasketPrice">The Organization of the Petroleum Exporting Countries Basket Price</option>
+    <option value="ExchangeRate">Exchange Rate</option>
+    <option value="Export">Export</option>
+    <option value="InflationRate">Inflation Rate</option>
+  </select>
+    </div>
+    <div class="website">
+      <label for="inSectorsOption">Select Website:</label>
+      <select id="inSectorsOption" name="international-website"></select>
+       <label for="inDestinationDirectory"></label>
+      <input id="inDestinationDirectory" type="text" placeholder="Directory to store in your computer" name="path-international">
+      <label for="inflationYear"></label><input id="inflationYear" type="text" placeholder="year to scrape data" name="infYear">
+      <!-- Additional Info Section for International Website -->
+      <div class="additional-info" id="date">
+        <div class="date-inputs">
+          <label for="dateIndo">Date:</label>
+          <input name="date" type="date" id="dateIndo">
+        </div>
+      </div>
+      <div class="additional-info" id="start-end">
+        <div class="date-inputs">
+          <!-- <input name="page_number" type="number" placeholder="Page number" id="additionalPageNumber"> -->
+          <label for="additionalStartDate">Start:</label><input name="start_date" type="date"  id="additionalStartDate">
+          <label for="additionalEndDate">End:</label><input name="end_date" type="date"  id="additionalEndDate">
+        </div>
+      </div>
+      <div class="additional-info" id="month-year">
+        <div class="date-inputs">
+          <label for="moth-year">Month and year:</label>
+          <input name="month-year" type="month" id="moth-year">
+        </div>
+      </div>
+      <!-- Categories will be dynamically populated based on the selected website -->
+    </div>
+      <button type="submit" name="download_button_international">Download</button>
+    </form>
+  </div>
+</div>
+<nav class="secondary-navigation">
+  <p>Copyright © by 2012 - 2023 Ministry of Labour and Vocational Training.</p>
+</nav>
+<script src="assets/js/script.js"></script>
+<script>
+  // JavaScript code to display the alert message
+  {% if response %}
+    var responseData = {{ response | tojson | safe }}
+    if (responseData.status === 'success') {
+      // Display a success alert
+      displayAlert('success', responseData.message);
+    } else if (responseData.status === 'error') {
+      // Display an error alert
+      displayAlert('error', responseData.message); // Use 'danger' for error messages
+    }
+  {% endif %}
+
+  function displayAlert(type, message) {
+      const alertDiv = document.getElementById('download-status');
+      alertDiv.innerHTML = '<div class="alert alert-' + type + '">' + message + '</div>';
+    alertDiv.style.display = 'block';
+  }
+</script>
+{% endblock %}

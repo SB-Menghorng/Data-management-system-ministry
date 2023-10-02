@@ -1,5 +1,5 @@
-import os
 import threading
+from datetime import datetime
 
 import psutil
 
@@ -10,7 +10,9 @@ from processing.constant import psf
 from flask import render_template
 import subprocess
 
-from processing.scrape.Inflation_rate.scraper import InflationRate
+@app.route('/instruction')
+def instruction():
+    return render_template('instruction.html')
 
 # Define the Streamlit process globally
 streamlit_process = None
@@ -74,24 +76,23 @@ def home_page():
    - The Streamlit application is launched as a separate thread to prevent blocking the main web application.
    - The thread is given a 3-second timeout to ensure it has enough time to start.
    - Clears the user's session data.
-   - Renders the 'home.html' template to display the home page of the web application.
+   - Renders the 'downloadForm.html' template to display the home page of the web application.
 
    Parameters:
        None
 
    Returns:
-       Flask response: Returns the rendered 'home.html' template as the home page of the web application.
+       Flask response: Returns the rendered 'downloadForm.html' template as the home page of the web application.
    """
     # Start the Streamlit process in a separate thread
     streamlit_thread = threading.Thread(target=start_streamlit)
     streamlit_thread.start()
     streamlit_thread.join(3)
     session.clear()
+    return render_template("downloadForm.html")
 
-    return render_template("home.html")
 
-
-def responding(func):
+def responding(func, name):
     """
     Helper function for generating response messages.
 
@@ -107,10 +108,11 @@ def responding(func):
 
     Example Usage:
         response = responding(some_function)
+        :param name:
     """
     try:
         func
-        responses = {'status': 'success', 'message': 'Data download successful!'}
+        responses = {'status': 'success', 'message': f'Data download from {name} successful!'}
     except Exception as e:
         responses = {'status': 'error', 'message': f'Error: {str(e)}'}
     return responses
@@ -133,13 +135,13 @@ def process_form():
     - Calls the appropriate data scraping function based on user input.
     - Generates a response message using the 'responding()' function to indicate success or failure.
     - Stores category, path, and choice in the Flask session.
-    - Renders the 'home.html' template, providing the response message.
+    - Renders the 'downloadForm.html' template, providing the response message.
 
     Parameters:
         None
 
     Returns:
-        Flask response: Returns the rendered 'home.html' template with the response message.
+        Flask response: Returns the rendered 'downloadForm.html' template with the response message.
 
     Example Usage:
         This function is invoked when a POST request is made to the '/process_form' route.
@@ -153,44 +155,54 @@ def process_form():
         choice = request.form.get('category-domestic')  # Use 'category-download' for domestic data
         website = request.form.get('domestic-websites')
 
-        if website == 'website1':
-            response = responding(DomesticData.GDP(path, choice).scrap_GDP_Choice())
+        DomesticScraper = DomesticData.Scraper(path, choice)
+
+        if website == 'GDP':
+            response = responding(DomesticScraper.GDP(), 'GDP')
         else:
-            response = responding(DomesticData.NBC(path, choice).scrap_NBC_Choice())
+            response = responding(DomesticScraper.NBC(), 'NBC')
 
     if "download_button_international" in request.form:
         category = 'international'
+        year, month, day = None, None, None
 
         # Retrieve user input
+        sector = request.form.get('International-Sectors')
+        choice = request.form.get('international-website')
+
+        date_string = request.form.get('date')
+        year_inflation = request.form.get('infYear')
+
+        # Convert the date string to a datetime object
+        if date_string:
+            date_object = datetime.strptime(date_string, '%Y-%m-%d')
+
+            # Extract year, month, and day from the datetime object
+            year = date_object.year
+            month = date_object.month
+            day = date_object.day
+        elif year_inflation:
+            year = int(year_inflation)
+
         path = request.form.get('path-international')
-        website = request.form.get('international-website')
-        day = request.form.get('day')
-        month = request.form.get('month')
-        year = request.form.get('year')
+        option = request.form.get('iInternational-Sectors')
 
         start_date = request.form.get('start_date')
         end_date = request.form.get('end_date')
-        # page_number = int(request.form.get('page_number'))
-        input_date_str = request.form.get('input_date_str')
+        month_year = request.form.get('month-year')
 
-        scrapping = International.Scraper(path=path, year=year, day=day, month=month)
+        scrapping = International.Scraper(choice=choice, destinationDir=path, option=option, day=day,
+                                          start_date=start_date, end_date=end_date, month=month, year=year,
+                                          month_year=month_year)
 
-        if website == 'website1':
-            response = responding(scrapping.opec_org())
-        elif website == 'website2':
-            response = responding(scrapping.ExchangeRateIndonesia())
-        elif website == 'website3':
-            response = responding(scrapping.thailand_exchange_rate())
-        elif website == 'website4':
-            response = responding(scrapping.exp_srilanka())
-        elif website == 'website5':
-            response = responding(scrapping.china_exchange_rate(path=path, start_date=start_date, end_date=end_date))
-        elif website == 'website6':
-            response = responding(scrapping.adb())
-        elif website == 'website7':
-            response = responding(scrapping.banglashdesh_ex_rate(input_date_str=input_date_str))
-        elif website == 'website8':
-            response = responding(InflationRate())
+        if sector == 'ExchangeRate':
+            response = responding(scrapping.ExchangeRate(), 'Exchange Rate')
+        elif sector == 'Export':
+            response = responding(scrapping.Export(), 'Export')
+        elif sector == 'OpecBasketPrice':
+            response = responding(scrapping.OpecBasketPrice(), 'OpecBasket Price')
+        elif sector == 'InflationRate':
+            response = responding(scrapping.InflationRate(), 'Inflation Rate')
 
     # Store data in Flask session
     session['category'] = category
@@ -198,7 +210,7 @@ def process_form():
     session['choice'] = choice
 
     # Handle other form submissions or render the page as needed
-    return render_template("home.html", response=response)
+    return render_template("downloadForm.html", response=response)
 
 
 @app.route('/streamlit')
@@ -225,8 +237,3 @@ def streamlit_page():
     options = session.get('choice')
 
     return render_template('streamlit.html', category=categories, path=destination, choice=options)
-
-
-@app.route('/testing')
-def testing():
-    return render_template('test.html')
