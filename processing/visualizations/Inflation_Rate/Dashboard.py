@@ -1,75 +1,75 @@
-import base64
-import datetime
-import io
-import re
-
 import pandas as pd
-import plotly.graph_objects as go
+import numpy as np
 import streamlit as st
-
-from processing.constant import Inflation
-
+import plotly.express as px
+import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+import datetime
+import re
+import base64
+import io
+import plotly.graph_objects as go
+from processing.constant import excelName1
 
 def plot_line_chart(data, start_date, end_date):
     fig = go.Figure()
     selected_countries = data["Country"]
     data_columns = list(data.columns[0:])  # Convert Index object to a list
-
+    
     # Convert start_date and end_date to match the data format ("%B-%Y")
     start_date_str = start_date.strftime("%B-%Y")
     end_date_str = end_date.strftime("%B-%Y")
-
+    
     # Check if start_date and end_date are in data_columns
     if start_date_str not in data_columns:
         raise ValueError(f"Start date {start_date_str} is not available in the dataset.")
     if end_date_str not in data_columns:
         raise ValueError(f"End date {end_date_str} is not available in the dataset.")
-
+    
     # Filter data based on start_date and end_date
     start_index = data_columns.index(start_date_str)
     end_index = data_columns.index(end_date_str) + 1
     filtered_data_columns = data_columns[start_index:end_index]
-
+    
     for i, country in enumerate(selected_countries):
         values = data.loc[data['Country'] == country].iloc[:, start_index:end_index].values.flatten()
         fig.add_trace(go.Scatter(x=filtered_data_columns, y=values, mode='lines+markers', name=country))
-
+    
     fig.update_layout(
         xaxis_title='កាលបរិច្ឆេទ',
         yaxis_title='អត្រាអតិផរណារ',
         xaxis_title_font=dict(family='Khmer OS Siemreap', size=14, color='black'),
         yaxis_title_font=dict(family='Khmer OS Siemreap', size=14, color='black'),
-        # yaxis_tickformat='%'
+        #yaxis_tickformat='%'
     )
 
     fig.update_layout(width=700, height=500, showlegend=True)
     st.plotly_chart(fig)
-
-
+    
 def plot_bar_chart(data, start_date, end_date):
     fig = go.Figure()
     selected_countries = data["Country"]
     data_columns = list(data.columns[0:])  # Convert Index object to a list
-
+    
     # Convert start_date and end_date to match the data format ("%B-%Y")
     start_date_str = start_date.strftime("%B-%Y")
     end_date_str = end_date.strftime("%B-%Y")
-
+    
     # Check if start_date and end_date are in data_columns
     if start_date_str not in data_columns:
         raise ValueError(f"Start date {start_date_str} is not available in the dataset.")
     if end_date_str not in data_columns:
         raise ValueError(f"End date {end_date_str} is not available in the dataset.")
-
+    
     # Filter data based on start_date and end_date
     start_index = data_columns.index(start_date_str)
     end_index = data_columns.index(end_date_str) + 1
     filtered_data_columns = data_columns[start_index:end_index]
-
+    
     for i, country in enumerate(selected_countries):
         values = data.loc[data['Country'] == country].iloc[:, start_index:end_index].values.flatten()
         fig.add_trace(go.Bar(x=filtered_data_columns, y=values, name=country))
-
+    
     fig.update_layout(
         xaxis_title='កាលបរិច្ឆេទ',
         yaxis_title='អត្រាអតិផរណារ',
@@ -79,8 +79,8 @@ def plot_bar_chart(data, start_date, end_date):
     fig.update_layout(width=700, height=500, showlegend=True)
     st.plotly_chart(fig)
 
-
 def load_data(df):
+
     df = df[['Year', 'Month', 'Country', 'Value']]
     df = df.rename(columns={'Country': 'Country', 'Year': 'Year', 'Month': 'Month', 'Value': 'Inflation Rate'})
     df['Month_Year'] = df['Month'].astype(str) + '-' + df['Year'].astype(str)
@@ -92,11 +92,12 @@ def load_data(df):
     # Reorder the columns to run from the first month of the year
     column_order = ['Country'] + sorted(new_table.columns[1:], key=lambda x: pd.to_datetime(x, format='%B-%Y'))
     new_table = new_table[column_order]
-
+    
     return new_table
 
 
 def pivot_table(df, start_date, end_date):
+    
     df['Date'] = pd.to_datetime(df['Year'].astype(str) + '-' + df['Month'], format='%Y-%B')
 
     start_date = pd.to_datetime(start_date)
@@ -109,10 +110,11 @@ def pivot_table(df, start_date, end_date):
     # Format the date columns
     pivot_table.columns = pivot_table.columns.strftime('%Y-%b')
 
+
     return pivot_table
 
-
 def date_input_sidebar(start_date, end_date):
+    
     st.sidebar.subheader('Date Selection')
 
     start_year, start_month = start_date.year, start_date.month
@@ -144,6 +146,7 @@ def date_input_sidebar(start_date, end_date):
     else:
         end_month_options = month_names[selected_start_month_index:]
 
+
     selected_end_month = st.sidebar.selectbox('End Month', end_month_options)
 
     # Get the month index and add 1 to convert it back to the month number
@@ -155,7 +158,6 @@ def date_input_sidebar(start_date, end_date):
     selected_end_date = datetime.datetime(selected_end_year, selected_end_month, 1)
 
     return selected_start_date, selected_end_date
-
 
 def timestamp_check(df, countries):
     df['YearMonth'] = pd.to_datetime(df['Year'].astype(str) + '-' + df['Month'], format='%Y-%B')
@@ -235,7 +237,7 @@ def find_countries_with_cpli_or_base(df, selected_start_date, selected_end_date,
 
     filtered_df = df[(df['Year'] >= selected_start_date.year) & (df['Year'] <= selected_end_date.year)]
 
-    filtered_df = filtered_df.drop_duplicates(subset=['Country', 'Note'])
+    filtered_df = filtered_df.drop_duplicates(subset=[ 'Country', 'Note'])
 
     for _, row in filtered_df.iterrows():
         year = row['Year']
@@ -243,28 +245,27 @@ def find_countries_with_cpli_or_base(df, selected_start_date, selected_end_date,
 
         if re.search(r'(CPI|Base|base)\s+(\d{4})', str(note), re.IGNORECASE):
             country = row['Country']
-
+            
             if selected_countries is not None and country not in selected_countries:
                 continue
-
+            
             country_notes.append({'year': year, 'country': country, 'note': note})
-
+    
     for item in country_notes:
         st.write("Note: "f"{item['country']} {item['note']}")
-
+    
     return country_notes
-
 
 def category_data(df, start_date, end_date):
     start_date = pd.to_datetime(start_date, format='%Y-%m')
     end_date = pd.to_datetime(end_date, format='%Y-%m')
     filtered_df = df[(df['YearMonth'] >= start_date) & (df['YearMonth'] <= end_date)]
-
+    
     max_row = filtered_df[filtered_df["Value"] == filtered_df["Value"].max()]
     min_row = filtered_df[filtered_df["Value"] == filtered_df["Value"].min()]
     avg_value = filtered_df["Value"].mean()
     update_frequency = filtered_df["Update frequency"].iloc[0]
-
+    
     return max_row, min_row, avg_value, update_frequency
 
 
@@ -301,8 +302,7 @@ def business_partners(df):
             unsafe_allow_html=True
         )
         new_table = load_data(filtered_df)
-        max_row, min_row, avg_value, update_frequency = category_data(filtered_df, selected_start_date,
-                                                                      selected_end_date)
+        max_row, min_row, avg_value, update_frequency = category_data(filtered_df, selected_start_date, selected_end_date)
         col1, col2, col3, col4 = st.columns(4)
 
         box_color = "rgba(161, 219, 255, 0.3)"
@@ -353,6 +353,7 @@ def business_partners(df):
                 unsafe_allow_html=True
             )
 
+
         with col4:
             st.markdown(
                 f'<div style="background-color: {box_color}; padding: 10px; border-radius: 5px;">'
@@ -367,7 +368,7 @@ def business_partners(df):
                 f'<span style="font-size: 24px;">{update_frequency}</span></div>',
                 unsafe_allow_html=True
             )
-
+        
         column_width = "50%"
         col1, col2 = st.columns(2)
         with col1:
@@ -376,16 +377,14 @@ def business_partners(df):
         with col2:
             st.markdown(f'<div style="width: {400};"></div>', unsafe_allow_html=True)
             plot_bar_chart(new_table, selected_start_date, selected_end_date)
-        country_notes = find_countries_with_cpli_or_base(df, selected_start_date, selected_end_date, country)
-        # st.write(country_notes)
-
-
+        country_notes = find_countries_with_cpli_or_base(df,selected_start_date, selected_end_date,country)
+        #st.write(country_notes)
+        
 def competitors(df):
-    # comp=compititors
-    comp_countries = ["Bangladesh", "Indonesia ", "Thailand", "Vietnam", "Sri Lanka", "Philipinas", "Malaysia", "Lao",
-                      "Singapore"]
+    #comp=compititors
+    comp_countries = ["Bangladesh", "Indonesia ", "Thailand", "Vietnam", "Sri Lanka", "Philipinas", "Malaysia", "Lao", "Singapore"]
     comp_df = df[df["Country"].isin(comp_countries)]
-    # st.table(comp_df, 100, 200)
+    #st.table(comp_df, 100, 200)
 
     # Side Bar
     country = st.sidebar.multiselect("Select Countries", comp_df["Country"].unique(), key="competitor_countries")
@@ -416,8 +415,7 @@ def competitors(df):
             unsafe_allow_html=True
         )
         new_table = load_data(filtered_df)
-        max_row, min_row, avg_value, update_frequency = category_data(filtered_df, selected_start_date,
-                                                                      selected_end_date)
+        max_row, min_row, avg_value, update_frequency = category_data(filtered_df, selected_start_date, selected_end_date)
         col1, col2, col3, col4 = st.columns(4)
 
         box_color = "rgba(161, 219, 255, 0.3)"
@@ -468,6 +466,7 @@ def competitors(df):
                 unsafe_allow_html=True
             )
 
+
         with col4:
             st.markdown(
                 f'<div style="background-color: {box_color}; padding: 10px; border-radius: 5px;">'
@@ -482,8 +481,8 @@ def competitors(df):
                 f'<span style="font-size: 24px;">{update_frequency}</span></div>',
                 unsafe_allow_html=True
             )
-
-        # st.dataframe(new_table)
+        
+        #st.dataframe(new_table)
         column_width = "50%"
         col1, col2 = st.columns(2)
         with col1:
@@ -492,15 +491,15 @@ def competitors(df):
         with col2:
             st.markdown(f'<div style="width: {400};"></div>', unsafe_allow_html=True)
             plot_bar_chart(new_table, selected_start_date, selected_end_date)
-        country_notes = find_countries_with_cpli_or_base(df, selected_start_date, selected_end_date, country)
-        # st.write(country_notes)
-
+        country_notes = find_countries_with_cpli_or_base(df,selected_start_date, selected_end_date,country)
+        #st.write(country_notes)
 
 def default_mode(df):
-    # comp=compititors
-    def_countries = ["Bangladesh", "Indonesia ", "Thailand", "Vietnam", "Singapore"]
+
+    #comp=compititors
+    def_countries = ["Bangladesh", "Indonesia ", "Thailand", "Vietnam",  "Singapore"]
     def_df = df[df["Country"].isin(def_countries)]
-    # st.table(comp_df, 100, 200)
+    #st.table(comp_df, 100, 200)
 
     selected_start_date, selected_end_date = timestamp_check(def_df, def_countries)
     st.markdown(
@@ -577,6 +576,7 @@ def default_mode(df):
             unsafe_allow_html=True
         )
 
+
     with col4:
         st.markdown(
             f'<div style="background-color: {box_color}; padding: 10px; border-radius: 5px;">'
@@ -591,8 +591,8 @@ def default_mode(df):
             f'<span style="font-size: 24px;">{update_frequency}</span></div>',
             unsafe_allow_html=True
         )
-
-    # st.dataframe(new_table)
+    
+    #st.dataframe(new_table)
     column_width = "50%"
     col1, col2 = st.columns(2)
     with col1:
@@ -602,12 +602,29 @@ def default_mode(df):
         st.markdown(f'<div style="width: {400};"></div>', unsafe_allow_html=True)
         plot_bar_chart(new_table, selected_start_date, selected_end_date)
 
-    country_notes = find_countries_with_cpli_or_base(df, selected_start_date, selected_end_date, def_countries)
-    # st.write(country_notes)
+    country_notes = find_countries_with_cpli_or_base(df,selected_start_date, selected_end_date,def_countries)
+    #st.write(country_notes)
+    
+
 
 
 def Dashboard():
-    df = pd.read_csv(Inflation)
+
+    df = pd.read_csv("SampleSpreadSheet.csv")
+    
+    st.set_page_config(
+        page_title = "Ministry of Labour and Vocational Training",
+        page_icon = "https://res.cloudinary.com/aquarii/image/upload/v1643955074/Ministry-of-Labour-Vocational-Training-MoLVT-2.jpg",
+        layout= "wide",
+        initial_sidebar_state="collapsed"
+    #     menu_items={
+    #         'Get Help': 'https://www.extremelycoolapp.com/help',
+    #         'Report a bug': 'https://www.extremelycoolapp.com/bug',
+    #         'About' :"This is a header. This is an *extremely* cool app!"
+    # }
+
+
+    )
 
     hide_st_style = """
                 <style>
@@ -616,6 +633,7 @@ def Dashboard():
                 </style>
                 """
     st.markdown(hide_st_style, unsafe_allow_html=True)
+
 
     st.markdown(
         """
@@ -644,3 +662,4 @@ def Dashboard():
 
 if __name__ == '__main__':
     Dashboard()
+

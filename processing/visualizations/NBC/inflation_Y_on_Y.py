@@ -1,12 +1,11 @@
+import plotly.graph_objects as go
+import streamlit as st
 import pandas as pd
 import streamlit as st
 import calendar
 import plotly.graph_objects as go
 from streamlit_option_menu import option_menu
 from io import BytesIO
-import datetime
-from processing.cleaning.NBC.NBC_Clean import NBC_14
-from processing.constant import excelName2
 
 
 def load_dataset(df):
@@ -19,6 +18,7 @@ def load_dataset(df):
 
 
 def select_date_range(df):
+    st.sidebar.image("https://www.minimumwage.gov.kh/wp-content/uploads/2017/11/logo_ministry_for_mobile.png")
     st.sidebar.subheader("Select Date")
     # Start month and year
     start_month = st.sidebar.selectbox("Start Month", list(calendar.month_name)[1:], key="start_month_select")
@@ -59,7 +59,6 @@ def process_selected_data(df, selected_columns):
 
 def plot_line_chart(df):
     fig = go.Figure()
-
     for column in df.columns:
         fig.add_trace(go.Scatter(x=df.index, y=df[column], mode='lines+markers', name=column))
 
@@ -71,7 +70,11 @@ def plot_line_chart(df):
         yaxis=dict(gridcolor='lightgray'),
         plot_bgcolor='rgb(240, 240, 240)',  # Set background color
         paper_bgcolor='rgb(255, 255, 255)',  # Set paper background color
-
+        legend=dict(
+            orientation="h",  # Set legend orientation to horizontal
+            yanchor="bottom",  # Anchor the legend to the bottom of the graph
+            y=-0.5  # Adjust the vertical position of the legend
+        )
     )
     fig.update_layout(
         xaxis_title=' ',
@@ -94,6 +97,13 @@ def plot_line_chart(df):
         df_display.to_excel(writer, index=True, header=True)
         writer.close()
         output.seek(0)
+
+        with st.spinner('Downloading Excel file...'):
+            st.download_button(label="Download Excel Data",
+                               data=output,
+                               file_name="data.xlsx",
+                               mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
     with st.expander("Graph", expanded=True):
         st.plotly_chart(fig, use_container_width=True)
 
@@ -105,6 +115,7 @@ def plot_bar_chart(df):
         fig.add_trace(go.Bar(x=df.index, y=df[column], name=column))
 
     fig.update_layout(
+        barmode='stack',  # Set barmode to 'stack' for stacked bar chart
         xaxis=dict(
             title='Date',
             tickformat='%d-%b-%Y'  # Format for displaying date with day, month, and year
@@ -112,40 +123,36 @@ def plot_bar_chart(df):
         yaxis=dict(gridcolor='lightgray'),
         plot_bgcolor='rgb(240, 240, 240)',  # Set background color
         paper_bgcolor='rgb(255, 255, 255)',  # Set paper background color
-
+        legend=dict(
+            orientation="h",  # Set legend orientation to horizontal
+            yanchor="bottom",  # Anchor the legend to the bottom of the graph
+            y=-0.7  # Adjust the vertical position of the legend
+        )
     )
-    # fig.update_layout(
-    #     xaxis_title=' ',
-    #     xaxis_title_font=dict(family='Khmer OS Siemreap', size=14, color='black')
-    # )
+
     fig.update_layout(width=900, height=450)
 
     with st.expander("Graph", expanded=True):
         st.plotly_chart(fig, use_container_width=True)
 
 
-def show_dashBoard(df1):
-    df = load_dataset(df1)
-
-    filtered_df = select_date_range(df)
-
-    data_names = list(filtered_df.columns)
-    st.sidebar.subheader("Select Category")
-    selected_columns = st.sidebar.multiselect("Select Products", data_names)
-    new_df = process_selected_data(filtered_df, selected_columns)
-
-    plot_line_chart(new_df)
-    plot_bar_chart(new_df)
-
-
 # Main Streamlit app
 def main():
-    # st.set_page_config(
-    #     page_title="Ministry of Labour and Vocational Training",
-    #     page_icon="https://res.cloudinary.com/aquarii/image/upload/v1643955074/Ministry-of-Labour-Vocational-Training-MoLVT-2.jpg",
-    #     layout="wide",
-    #
-    # )
+    st.set_page_config(
+        page_title="Ministry of Labour and Vocational Training",
+        page_icon="https://res.cloudinary.com/aquarii/image/upload/v1643955074/Ministry-of-Labour-Vocational-Training"
+                  "-MoLVT-2.jpg",
+        layout="wide",
+
+    )
+
+    hide_st_style = """
+                <style>
+                #MainMenu {visibility: hidden;}
+                footer {visibility: hidden;}
+                </style>
+                """
+    st.markdown(hide_st_style, unsafe_allow_html=True)
 
     st.markdown(
         """
@@ -167,30 +174,58 @@ def main():
             orientation="horizontal",
         )
 
-    df1, df2 = NBC_14(excelName2)  # df1=MoM, df2 = YoY
+    if selected == "Year on Year":
 
-    if not selected:
-        df = load_dataset(df1)
+        file_path = "Inflation_All_Items_Year_on_Year.csv"
+        # Load the dataset
+        df = pd.read_csv(file_path)
+        df = load_dataset(df)
 
-        # Set specific start and end dates
-        selected_start_date = datetime.datetime(2022, 1, 1)
-        selected_end_date = datetime.datetime(2022, 12, 31)
-
-        # Filter the DataFrame based on the specific date range
-        filtered_df = df.loc[(df['Date'] >= selected_start_date) & (df['Date'] <= selected_end_date)]
+        filtered_df = select_date_range(df)
 
         data_names = list(filtered_df.columns)
-        selected_columns = ['Food and Non-Alcoholic Beverages', 'Alcoholic Beverages, Tobacco and Narcotics',
-                            'Clothing and Footwear']
+        selected_columns = st.sidebar.multiselect("Select Products", data_names)
+        new_df = process_selected_data(filtered_df, selected_columns)
+
+        plot_line_chart(new_df)
+        plot_bar_chart(new_df)
+
+    elif selected == "Month on Month":
+
+        file_path = "Contribution_Inflation_Month_on_Month.csv"
+        # Load the dataset
+        df = pd.read_csv(file_path)
+        df = load_dataset(df)
+
+        filtered_df = select_date_range(df)
+
+        data_names = list(filtered_df.columns)
+        selected_columns = st.sidebar.multiselect("Select Products", data_names)
         new_df = process_selected_data(filtered_df, selected_columns)
         plot_line_chart(new_df)
         plot_bar_chart(new_df)
 
-    elif selected == "Year on Year":
-        show_dashBoard(df2)
+    else:
 
-    elif selected == "Month on Month":
-        show_dashBoard(df1)
+        file_path = "Contribution_Inflation_Month_on_Month.csv"
+        # Load the dataset
+        df = pd.read_csv(file_path)
+        df = load_dataset(df)
+
+        df['Date'] = pd.to_datetime(df['Date'])
+
+        # Define start_date and end_date
+        start_date = pd.to_datetime('2023-01-01')
+        end_date = pd.to_datetime('2023-12-31')
+
+        # Filter the dataset based on the start_date and end_date
+        filtered_df = df[(df['Date'] >= start_date) & (df['Date'] <= end_date)]
+
+        selected_columns = ['Food and Non-Alcoholic Beverages', 'Alcoholic Baveraged, Tobacco and Narcotics',
+                            'Clothing and Footwear']
+        new_df = process_selected_data(filtered_df, selected_columns)
+        plot_line_chart(new_df)
+        plot_bar_chart(new_df)
 
 
 if __name__ == "__main__":

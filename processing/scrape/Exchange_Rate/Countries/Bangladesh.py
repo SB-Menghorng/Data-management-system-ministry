@@ -65,8 +65,3 @@ class ExchangeRateScraperBB(WebDriverHandler):
         return df1
 
 
-# dir = r'D:\Intership\Labour ministry of combodain\demo'
-# sc = ExchangeRateScraperBB()
-# df = sc.scrape_exchange_rate(dir, 'USD', 'February, 2020')
-# print(df.info())
-# print(','.join(tuple(('February', '20220'))))

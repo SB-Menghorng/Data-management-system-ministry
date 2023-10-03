@@ -2,6 +2,7 @@ from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 from processing.scrape.Inflation_rate.Operations.extract_xml import extract_xml
+from processing.scrape.operations.selenium_ import WebDriverHandler
 
 
 class InflationRateScraper:
@@ -110,5 +111,5 @@ class InflationRateScraper:
             return df1[['Country', 'Source', 'Update frequency', 'Status', 'Year', 'Month', 'Value', 'Publish Date',
                         'Link', 'Note']]
 
-# scp = InflationRateScraper()
-# print(scp.extract_data().info())
+# scp = InflationRateScraper(WebDriverHandler())
+# print(scp.extract_data().to_csv('japan.csv', index=False))

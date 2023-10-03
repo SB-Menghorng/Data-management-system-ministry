@@ -1,7 +1,7 @@
 import concurrent.futures
 import pandas as pd
 
-from processing.constant import host, password, user, table_name1, database_name
+from processing.constant import host, password, user, table_name1, table_name2, database_name
 from processing.connection.database import Database
 from processing.scrape.Inflation_rate.Countries import (Vietnam, Indonesia, Japanes, Philippines, Singapore, SriLanka,
                                                         Thai, Lao)
@@ -146,7 +146,8 @@ def InflationRate(year, option):
 
             # Process results
             df_jp = results.get("Japan")
-            db.create_table()
+            db = Database(host, password, user, table=table_name2, database=database_name)
+            db.create_table(table_name=table_name2)
             db.insert_data(df_jp)
             print(df_jp)
 

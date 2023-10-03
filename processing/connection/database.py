@@ -219,21 +219,25 @@ class Database:
             cursor.close()
             mydb.close()
 
-    def tableChoice(self, table_name):
+    @staticmethod
+    def tableChoice(table_name):
         if table_name == 'Inflation':
-            Indicator='Inflation'
-            unit='percentage'
-            title='Inflation rate'
+            Indicator = 'Inflation'
+            unit = 'percentage'
+            title = 'Inflation rate'
             return Indicator, unit, title
         elif table_name == 'Consumer_Price_Index':
-            Indicator='Consumer '
-            unit='Consumer Price Index'
-            title='Inflation rate'
+            Indicator = 'Consumer '
+            unit = 'Consumer Price Index'
+            title = 'Inflation rate'
             return Indicator, unit, title
 
-    def read_database(self, table_name):
+    def read_database(self, table_name=None):
+        if table_name is None:
+            your_table = self.table
+        else:
+            your_table = table_name
         Indicator, unit, title = self.tableChoice(table_name)
-        your_table = self.table
 
         # Define your SQL query
         sql_query = f"SELECT * FROM {your_table}"
@@ -256,9 +260,11 @@ class Database:
                            'Link': 'Link', 'UpdateFrequency': 'Update frequency'}, inplace=True)
 
         missing_cols = [col for col in base_col if col not in df.columns]
+        unique_values = lambda x: [x]*df.shape[0]
         nrow = df.shape[0]
         for i, col in enumerate(missing_cols):
             df[col] = \
-                [[title] * nrow, [Indicator] * nrow, ['.'] * nrow,
+                [unique_values(title), [Indicator] * nrow, ['.'] * nrow,
                  ['.'] * nrow, ['.'] * nrow, ['.'] * nrow, ['.'] * nrow, ['.'] * nrow, [unit] * nrow, [None] * nrow][i]
+            # [title, Indicator, '.', '.']
         return df[base_col]

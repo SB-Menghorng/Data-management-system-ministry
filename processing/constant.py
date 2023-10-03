@@ -25,6 +25,9 @@ Inflation = r"D:\Intership\Labour ministry of combodain\test\SampleSpreadSheet.c
 # File test
 fltest = r"some_asean_and_european_currencies_against_khmer_riel_end_period.csv"
 
+# Opec Basket Price
+opec_file = r"D:\Intership\Labour ministry of combodain\demo\International\OPEC\OPEC_Basket_Price.csv"
+
 # @Database Setup
 host = 'localhost'
 password = 'menghorng'
@@ -37,12 +40,14 @@ table_name2 = 'Consumer_Price_Index'
 engine = create_engine(url=f"mysql+mysqlconnector://{user}:{password}@{host}/{database_name}", pool_recycle=3600)
 
 # @Excel
-excel = r"D:\Intership\Labour ministry of combodain\test\DataSampleForChecking (2).xlsx"
+# Inflation Rate international excel directory
+excelName1 = r"D:\Intership\Labour ministry of combodain\test\DataSampleForChecking (2).xlsx"
 sheet_name = "DatabaseSample"
 
 # Excel FIle name on Inflation Domestic
 excelName2 = (r"D:\Intership\Labour ministry of combodain\demo\DomesticData\NBC\monetary_and_financial_statistics_data"
               r"\14.contributiontoinflationjun-23_6926.xlsx")
 
-excelPathConst = r"C:/Users/Acer/Downloads/Internship/Data.xlsx"
+# Relate to Databases Management if there are no input of location of it will store here.
+excelPathConst = r"D:\Intership\Labour ministry of combodain\test1\Data.xlsx"
 sheetNameConst = r"Sheet1"

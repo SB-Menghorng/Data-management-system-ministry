@@ -34,11 +34,12 @@ class ForexScraper(WebDriverHandler):
         This class simplifies web scraping tasks for foreign exchange rate data using Selenium and provides
         a structured DataFrame for further analysis and processing.
     """
+
     def __init__(self, target_currency, start_date, end_date_, path):
         self.target_currency = target_currency
         self.start_date = start_date
         self.end_date = end_date_
-        self.path =os.path.join(path, 'China')
+        self.path = os.path.join(path, 'China')
         os.makedirs(self.path, exist_ok=True)
         super().__init__()
 

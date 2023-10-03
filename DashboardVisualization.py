@@ -1,7 +1,7 @@
 import streamlit as st
 from processing.visualizations.Inflation_Rate.Dashboard import Dashboard
 from processing.visualizations.NBC import inflation_Y_on_Y
-
+from processing.visualizations.Opec import opecdashboard
 
 if __name__ == "__main__":
     st.set_page_config(
@@ -9,7 +9,7 @@ if __name__ == "__main__":
         page_icon="https://res.cloudinary.com/aquarii/image/upload/v1643955074/Ministry-of-Labour-Vocational-Training"
                   "-MoLVT-2.jpg",
         layout="wide",
-        initial_sidebar_state="collapsed"
+        initial_sidebar_state="expanded",
     )
     st.sidebar.markdown(
         """
@@ -31,28 +31,13 @@ if __name__ == "__main__":
         'choice': choice
     }
 
-    # if category == 'domestic':
-    #     dom_merchandise(path)
-    # elif category == 'international':
-    #     st.write('international')
-    #     option = st.sidebar.selectbox("Select a dashboard:", ["Dashboard 1", "Dashboard 2"])
-    #
-    #     # Use conditional statements to display the selected dashboard
-    #     if option == "Dashboard 1":
-    #         dashboard1()
-    #     elif option == "Dashboard 2":
-    #         main()
-    #     # elif option == "Dashboard 3":
-    #         # visualize_economic_data()
-    # else:
-    # # Handle unexpected values of 'category'
-    # st.write("Invalid category value.")
-    # Create a select for menu selection
-    option = st.sidebar.selectbox("Select a dashboard:", ["Inflation Rate", "Contribution Inflation", "OpecBasket Price"])
+    option = st.sidebar.selectbox("Select a dashboard:",
+                                  ["Inflation Rate", "Contribution Inflation", "OpecBasket Price"])
     # Use conditional statements to display the selected dashboard
     if option == "Inflation Rate":
         Dashboard()
 
     elif option == "Contribution Inflation":
         inflation_Y_on_Y.main()
-
+    elif option == "OpecBasket Price":
+        opecdashboard.main()
