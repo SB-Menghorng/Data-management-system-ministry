@@ -9,7 +9,7 @@ def dom_merchandise(file_directory):
     domestic_data = DomesticData(path_destination=file_directory)
 
     # Get the merchandise_trad data from the DomesticData class
-    df_list = domestic_data.merchandise_trad()
+    df_list = domestic_data.GDP()
 
     # List all the files in the directory (change the directory path as needed)
     file_list = os.listdir(file_directory)

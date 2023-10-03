@@ -1,7 +1,7 @@
 import concurrent.futures
 import pandas as pd
 
-from processing.constant import host, password, user, your_table_name, database_name
+from processing.constant import host, password, user, table_name1, database_name
 from processing.connection.database import Database
 from processing.scrape.Inflation_rate.Countries import (Vietnam, Indonesia, Japanes, Philippines, Singapore, SriLanka,
                                                         Thai, Lao)
@@ -44,7 +44,7 @@ from processing.scrape.operations.selenium_ import WebDriverHandler
 
 
 def InflationRate(year, option):
-    db = Database(host, password, user, table=your_table_name, database=database_name)
+    db = Database(host, password, user, table=table_name1, database=database_name)
 
     def scrape_vietnam():
         driver = WebDriverHandler()
@@ -146,6 +146,7 @@ def InflationRate(year, option):
 
             # Process results
             df_jp = results.get("Japan")
+            db.create_table()
             db.insert_data(df_jp)
             print(df_jp)
 
@@ -155,5 +156,4 @@ def InflationRate(year, option):
 
 
 
-# InflationRate(2020)
 

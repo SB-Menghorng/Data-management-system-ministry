@@ -38,7 +38,8 @@ class ForexScraper(WebDriverHandler):
         self.target_currency = target_currency
         self.start_date = start_date
         self.end_date = end_date_
-        self.path = path
+        self.path =os.path.join(path, 'China')
+        os.makedirs(self.path, exist_ok=True)
         super().__init__()
 
     def scrape_data(self):

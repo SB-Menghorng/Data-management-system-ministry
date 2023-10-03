@@ -17,7 +17,7 @@ class ExchangeRate:
             Scrapes exchange rate data based on the specified options and parameters.
     """
 
-    def __init__(self, destination_path, currency, option, day,  start_date, end_date, month, year, month_year):
+    def __init__(self, destination_path, option, day, start_date, end_date, month, year, month_year, currency='USD'):
         self.day = day
         self.start_date = start_date
         self.end_date = end_date
@@ -65,5 +65,5 @@ class ExchangeRate:
         scraper.scrape_exchange_rate_indonesia()
 
     def Thailand(self):
-        scraper = Thailand.BankThailandScraper(download_dir=self.destinationPath, teardown=False)
+        scraper = Thailand.BankThailandScraper(destinationDir=self.destinationPath)
         scraper.download_exchange_rate_csv()

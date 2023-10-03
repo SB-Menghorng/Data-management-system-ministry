@@ -4,14 +4,13 @@ import os.path
 from processing.scrape.OPEC_Basket_Price import OpecOrg
 from processing.scrape.Exchange_Rate.ExchangeRateScraper import ExchangeRate
 
-from processing.scrape.Export.Countries import Srilanka
+from processing.scrape.Export import ExportScraper
 
 
 class Scraper:
-    def __init__(self, choice, destinationDir, option, day, start_date, end_date, month, year, month_year,
+    def __init__(self, choice, destinationDir, day, start_date, end_date, month, year, month_year,
                  currency='USD'):
         self.choice = choice
-        self.option = option
         self.start_date = start_date
         self.end_date = end_date
         self.currency = currency
@@ -23,12 +22,13 @@ class Scraper:
 
     def ExchangeRate(self):
         scraper = ExchangeRate(day=self.day, destination_path=self.destinationDir, currency=self.currency,
-                               option=self.option, start_date=self.start_date,
+                               option=self.choice, start_date=self.start_date,
                                end_date=self.end_date, month=self.month, year=self.year, month_year=self.month_year)
         scraper.scrape()
 
     def Export(self):
-        Srilanka.exp_sri_lanka(self.destinationDir)
+        scraper = ExportScraper.Export(self.destinationDir)
+        scraper.srilanka()
 
     def OpecBasketPrice(self):
         OpecOrg.opec_org(self.destinationDir)

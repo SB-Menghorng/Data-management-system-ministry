@@ -1,7 +1,8 @@
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+import os.path
+from datetime import datetime
 
+import pandas as pd
+from selenium.webdriver.common.by import By
 from processing.scrape.operations.selenium_ import WebDriverHandler
 
 
@@ -26,6 +27,12 @@ class BankThailandScraper(WebDriverHandler):
            This class simplifies web scraping tasks for exchange rate data from the Bank of Thailand using Selenium.
        """
 
+    def __init__(self, destinationDir):
+
+        super().__init__()
+        self.storeDir = os.path.join(destinationDir, 'Thailand')
+        os.makedirs(self.storeDir, exist_ok=True)
+
     def download_exchange_rate_csv(self):
         """
         Download exchange rate data in CSV format from the website.
@@ -33,33 +40,71 @@ class BankThailandScraper(WebDriverHandler):
         This function clicks necessary buttons to trigger the download of exchange rate data.
         """
         self.get("https://www.bot.or.th/en/statistics/exchange-rate.html")
-        wait = WebDriverWait(self, 10)  # 10 seconds maximum wait time
+        cookies = self.get_cookies()
+        print(cookies)
+        print(len(cookies))
+        # Loop through the cookies list and add each cookie to the WebDriver instance
+        for cookie in cookies:
+            self.add_cookie(cookie)
 
-        # Wait for the "Got It" button to be clickable
-        got_it_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container-55222efc2a"]/div/div['
-                                                                         '3]/div/div/div/div/table/tbody/tr['
-                                                                         '3]/td[3]/button/span')))
-        got_it_button.click()
-        if got_it_button:
-            print('get to first step', got_it_button)
+        self.get("https://www.bot.or.th/en/statistics/exchange-rate.html")
 
-        # Click the currency element
-        currency_element = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container-b9454cb2b1"]/div/div['
-                                                                            '2]/bot-statistics/div['
-                                                                            '2]/div/div/div/div/div/div/div['
-                                                                            '2]/div/div[2]/div['
-                                                                            '2]/div/button[2]/i')))
-        currency_element.click()
-        if currency_element:
-            print('get into currency', currency_element)
+        table = self.find_element(By.ID, "table_tab_1")
+        print('Table', table)
 
-        # Click the download CSV button
-        download_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="container-b9454cb2b1"]/div/div['
-                                                                           '2]/bot-statistics/div['
-                                                                           '2]/div/div/div/div/div/div/div['
-                                                                           '2]/div/div[2]/div[2]/div/div[2]/ul/li['
-                                                                           '1]/button')))
+        header = table.find_element(By.CLASS_NAME, "table-header")
+        print('header', header)
+        table_header = header.find_element(By.TAG_NAME, 'table')
+        print('table header', table_header)
+        thead = table_header.find_element(By.TAG_NAME, 'thead').text
+        print('Thead', thead)
 
-        download_button.click()
-        if download_button:
-            print('download button clicked..', download_button)
+        table_body = table_header.find_element(By.TAG_NAME, 'tbody')
+        print('Body', table_body)
+        rows_currency = table_body.find_elements(By.TAG_NAME, 'tr')
+        currency = []
+        for row in rows_currency:
+            currency.append(row.text.replace('\n', ' '))
+
+        print(currency)
+        content = table.find_element(By.CLASS_NAME, "table-content")
+        print('content', content)
+
+        table_content = content.find_element(By.TAG_NAME, 'table')
+        thead_table_content = table_content.find_element(By.TAG_NAME, 'thead')
+        rows_thead = thead_table_content.find_elements(By.TAG_NAME, 'tr')
+
+        columns = []
+        for row in rows_thead:
+            cells = row.find_elements(By.TAG_NAME, 'th')
+            for cell in cells:
+                columns.append(cell.text)
+
+        print('columns', columns)
+
+        body_content = content.find_element(By.TAG_NAME, 'tbody')
+        rows_content = body_content.find_elements(By.TAG_NAME, 'tr')
+        columns = columns[2:4] + [columns[1]]
+        print(columns)
+        datas = [columns]
+        for row in rows_content:
+            data = []
+            cells = row.find_elements(By.TAG_NAME, 'td')
+            for cell in cells:
+                data.append(cell.text)
+            datas.append(data)
+
+        print(datas)
+        df = pd.DataFrame(datas[1:], columns=datas[0])
+        df[thead] = currency
+        columns_show = [df.columns.tolist()[-1]] + df.columns.tolist()[:-1]
+        df1 = df[columns_show]
+        print(df1)
+        # Get the current date and time
+        current_time = datetime.now()
+
+        # Format the timestamp as a string without invalid characters
+        formatted_time = current_time.strftime('%Y-%m-%d')
+        df1.to_csv(os.path.join(self.storeDir, f'{formatted_time}.csv'), index=False)
+
+

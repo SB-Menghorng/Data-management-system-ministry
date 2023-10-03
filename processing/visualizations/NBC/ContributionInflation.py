@@ -4,28 +4,10 @@ import os
 import warnings
 import plotly.express as px
 from processing.constant import thyda_dir, fltest
-import plotly.figure_factory as ff
-
 warnings.filterwarnings('ignore')
 
 
-# st.markdown(
-#     """
-#     <style>
-#     .sidebar .sidebar-content {
-#         width: 300px;
-#     }
-#     </style>
-#     """,
-#     unsafe_allow_html=False
-# )
-#
-# st.set_page_config(
-#     page_title="Ministry of Labour and Training!!",
-#     page_icon="https://res.cloudinary.com/aquarii/image/upload/v1643955074/Ministry-of-Labour-Vocational-Training-MoLVT-2.jpg",
-#     layout="wide"
-# )
-def visualize_economic_data():
+def visualize_economic_data(dir_file):
     # logo
     image_path = "https://freepngimg.com/download/technology/63583-visualization-data-illustration-png-image-high-quality.png"
     st.sidebar.image(image_path)
@@ -45,7 +27,7 @@ def visualize_economic_data():
     else:
         # don't forget to Change path jahh!
         os.chdir(thyda_dir)
-        df = pd.read_csv(fltest,
+        df = pd.read_csv(dir_file,
                          encoding="ISO-8859-1")
 
     # Date handling
@@ -164,5 +146,5 @@ def visualize_economic_data():
     st.plotly_chart(fig)
 
 
-if __name__ == "__main__":
-    visualize_economic_data()
+# if __name__ == "__main__":
+#     visualize_economic_data(df)

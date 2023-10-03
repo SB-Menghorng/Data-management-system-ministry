@@ -30,6 +30,8 @@ class ExchangeRateScraperBB(WebDriverHandler):
             :param target_currency:
             :param month:
         """
+        destination_dir = os.path.join(destination_dir, 'Bangladesh')
+        os.makedirs(destination_dir, exist_ok=True)
         url = "https://www.bb.org.bd/en/index.php/econdata/exchangerate"
         self.get(url)
 
@@ -59,12 +61,12 @@ class ExchangeRateScraperBB(WebDriverHandler):
         # Create a DataFrame
         column_names = ['Date', 'USD Buy', 'USD Sell']
         df1 = pd.DataFrame(data, columns=column_names)
-        df1.to_csv(os.path.join(destination_dir, 'Bangladesh.csv'))
+        df1.to_csv(os.path.join(destination_dir, f'{input_date_str}.csv'))
         return df1
 
 
 # dir = r'D:\Intership\Labour ministry of combodain\demo'
 # sc = ExchangeRateScraperBB()
-# df = sc.scrape_exchange_rate(dir, 'USD', 'February', '2020')
+# df = sc.scrape_exchange_rate(dir, 'USD', 'February, 2020')
 # print(df.info())
 # print(','.join(tuple(('February', '20220'))))

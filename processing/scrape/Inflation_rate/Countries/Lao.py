@@ -7,7 +7,7 @@ from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
 
 from processing.connection.database import Database
-from processing.constant import host, password, user, your_table_name, database_name
+from processing.constant import host, password, user, table_name1, database_name
 from processing.scrape.operations.selenium_ import WebDriverHandler
 
 

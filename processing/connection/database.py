@@ -1,8 +1,6 @@
 import mysql.connector as conn
 import pandas as pd
 
-from processing.constant import host, password, user, your_table_name, database_name
-
 
 class Database:
     def __init__(self, host, password, user, table=None, database=None):
@@ -221,12 +219,24 @@ class Database:
             cursor.close()
             mydb.close()
 
-    def read_database(self, your_condition, Indicator='Inflation', unit='percentage', title='Inflation rate'):
+    def tableChoice(self, table_name):
+        if table_name == 'Inflation':
+            Indicator='Inflation'
+            unit='percentage'
+            title='Inflation rate'
+            return Indicator, unit, title
+        elif table_name == 'Consumer_Price_Index':
+            Indicator='Consumer '
+            unit='Consumer Price Index'
+            title='Inflation rate'
+            return Indicator, unit, title
 
+    def read_database(self, table_name):
+        Indicator, unit, title = self.tableChoice(table_name)
         your_table = self.table
 
         # Define your SQL query
-        sql_query = f"SELECT * FROM {your_table} WHERE {your_condition}"
+        sql_query = f"SELECT * FROM {your_table}"
 
         # Connect to the database
         mydb, cursor = self.connection()
@@ -240,10 +250,10 @@ class Database:
         base_col = ['No.', 'Title', 'Country', 'Source', 'Update frequency', 'Status',
                     'Year', 'Month', 'Indicator', 'Sub 1', 'Sub 2', 'Sub 3', 'Sub 4',
                     'Sub 5', 'Sub 6', 'Unit', 'Value', 'Access Date', 'Publish Date',
-                    'Link (if available)', 'Note', 'Note.1']
+                    'Link', 'Note', 'Note.1']
 
         df.rename(columns={'No': 'No.', 'AccessDate': 'Access Date', 'PublishDate': 'Publish Date',
-                           'Link': 'Link (if available)', 'UpdateFrequency': 'Update frequency'}, inplace=True)
+                           'Link': 'Link', 'UpdateFrequency': 'Update frequency'}, inplace=True)
 
         missing_cols = [col for col in base_col if col not in df.columns]
         nrow = df.shape[0]
@@ -252,5 +262,3 @@ class Database:
                 [[title] * nrow, [Indicator] * nrow, ['.'] * nrow,
                  ['.'] * nrow, ['.'] * nrow, ['.'] * nrow, ['.'] * nrow, ['.'] * nrow, [unit] * nrow, [None] * nrow][i]
         return df[base_col]
-
-

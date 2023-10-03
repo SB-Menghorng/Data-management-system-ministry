@@ -23,10 +23,10 @@
         <ul class="right-nav-left">
             <li><a href="/instruction">Home</a></li>
             <li><a href="{{ url_for('home_page') }}">Data Collection</a></li>
-            <li><a >Databases Management</a></li>
+            <li><a href="{{ url_for('excelDashBoard') }}">Databases Management</a></li>
         </ul>
         <ul class="right-nav-right">
-            <li><a href="/streamlit" id="statisticLink">Dashboard Visualization</a></li>
+            <li><a href="{{ url_for('streamlit_page') }}" id="statisticLink">Dashboard Visualization</a></li>
         </ul>
     </nav>
     {% block content %}

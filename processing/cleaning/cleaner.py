@@ -1,6 +1,9 @@
 import os
 
-from processing.cleaning.merchandise_trad import clean_3, renameCol2Int
+import pandas as pd
+
+from processing.cleaning.GDP.merchandise_trad import clean_3, renameCol2Int
+from processing.cleaning.NBC.NBC_Clean import NBC_14
 
 
 class DomesticData:
@@ -26,7 +29,7 @@ class DomesticData:
         # Return the list of Excel file names
         return excel_files
 
-    def merchandise_trad(self):
+    def GDP(self):
         option = 'merchandise-trade'
         files = self.get_files(option)
 
@@ -38,27 +41,11 @@ class DomesticData:
 
         return df_list
 
-    def monetary_and_financial_statistics_data(self):
+    def NBC(self):
         option = 'monetary_and_financial_statistics_data'
         files = self.get_files(option)
-
-        df_list = []
+        df1, df2 = None, None
         for file in files:
-            csv_filename = clean_3(file, self.destination_directory)
-            df = renameCol2Int(csv_filename)
-            df_list.append(df)
-
-        return df_list
-
-
-
-# path = r"D:\Intership\Labour ministry of combodain\demo"
-# d = DomesticData(path)
-# print(d.merchandise_trad())
-# join = os.path.join(path, 'merchandise-trade')
-# l = os.listdir(join)
-# print(l)
-# for item in l:
-#     item_path = os.path.join(path, item)
-#     print(item_path)
-# print(os.path.join(path, 'merchandise-trade'))
+            if file[:26] == "14.contributiontoinflation":
+                df1, df2 = NBC_14(file)
+        return df1, df2

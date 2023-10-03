@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 
     const internationalSectorOption = {
-        ExchangeRate: ['Thailand', 'ADB', 'Bangladesh', 'Indonesia', 'China', 'All'],
+        ExchangeRate: ['Bangladesh', 'Indonesia', 'China', 'Thailand', 'ADB', 'All'],
         Export: ['Sri Lanka'],
         OpecBasketPrice: ['OPEC Basket Price'],
         InflationRate: ['Inflation Rate', 'Consumer Price Index']
@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", function() {
         } else if (this.value === 'ExchangeRate'){
                 hideAdditionalInfo(startEnd);
                 hideAdditionalInfo(monthYear);
-                hideAdditionalInfo(date);
+                showAdditionalInfo(date);
                 showAdditionalInfo(inDestinationDirectory)
                 hideAdditionalInfo(inflationYear)
         }

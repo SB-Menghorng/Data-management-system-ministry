@@ -48,12 +48,12 @@ class Excel:
         self.excel_file = excel_file
         self.sheet_name = sheet_name
 
-    def insert_into_existing_excel(self, df_insert, existing_excel=None, sheet_name=None, verify_cols=None):
+    def insert_into_existing_excel(self, df, existing_excel=None, sheet_name=None, verify_cols=None):
         """
         Inserts data from a given DataFrame into an existing Excel file and specified sheet, while handling duplicates and providing feedback.
 
         Parameters:
-            df_insert (pandas.DataFrame): The DataFrame containing data to be inserted.
+            df (pandas.DataFrame): The DataFrame containing data to be inserted.
             existing_excel (str): The path to the existing Excel file.
             sheet_name (str): The name of the sheet within the Excel file to insert data into.
             verify_cols (list): A list of column names used to identify duplicates.
@@ -71,6 +71,7 @@ class Excel:
 
         If the insertion is successful, the function prints a success message along with the number of rows inserted.
         """
+        
 
         if existing_excel is None:
             existing_excel = self.excel_file
@@ -81,7 +82,7 @@ class Excel:
             verify_cols = ['Title', 'Country', 'Year', 'Month']
         # Read the existing Excel file
         try:
-            df_exit = pd.read_excel(existing_excel, sheet_name=sheet_name)
+            df_exist = pd.read_excel(existing_excel, sheet_name=sheet_name)
         except FileNotFoundError:
             print(f"The Excel file '{existing_excel}' does not exist.")
             return
@@ -90,11 +91,11 @@ class Excel:
             return
 
         # Ensure the data types of columns in df match those in df_exit
-        for col, dtype in df_exit.dtypes.items():
-            df_insert[col] = df_insert[col].astype(dtype)
+        for col, dtype in df_exist.dtypes.items():
+            df[col] = df[col].astype(dtype)
 
         # Concatenate df_exit and df_not_duplicates_in_df_exit
-        concatenated_df = pd.concat([df_exit, df_insert], ignore_index=True)
+        concatenated_df = pd.concat([df_exist, df], ignore_index=True)
         concatenated_df['No.'] = [i for i in range(1, concatenated_df.shape[0] + 1)]
 
         num_duplicates = concatenated_df.duplicated(subset=verify_cols).sum()
@@ -107,8 +108,7 @@ class Excel:
         with pd.ExcelWriter(existing_excel, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
             # Write the concatenated DataFrame to the specified sheet
             concatenated_df.to_excel(writer, sheet_name=sheet_name, index=False)
-            inserted_rows_count = concatenated_df.shape[0] - df_exit.shape[0]
-            print(f'Successfully inserted {inserted_rows_count} rows.')
+            print('Insert successfully!', concatenated_df.shape[0] - df_exist.shape[0], 'rows')
 
     def delete_rows_from_excel_multiple_conditions(self, conditions):
         """

@@ -1,20 +1,19 @@
-import pandas as pd
-import streamlit as st
-import datetime
-import re
 import base64
+import datetime
 import io
+import re
 
+import pandas as pd
 import plotly.graph_objects as go
+import streamlit as st
 
-from processing.constant import thyda_dir, host, password, user, your_table_name, database_name
-from processing.connection.database import Database
+from processing.constant import Inflation
 
 
 def plot_line_chart(data, start_date, end_date):
     fig = go.Figure()
     selected_countries = data["Country"]
-    data_columns = list(data.columns[1:])  # Convert Index object to a list
+    data_columns = list(data.columns[0:])  # Convert Index object to a list
 
     # Convert start_date and end_date to match the data format ("%B-%Y")
     start_date_str = start_date.strftime("%B-%Y")
@@ -50,7 +49,7 @@ def plot_line_chart(data, start_date, end_date):
 def plot_bar_chart(data, start_date, end_date):
     fig = go.Figure()
     selected_countries = data["Country"]
-    data_columns = list(data.columns[1:])  # Convert Index object to a list
+    data_columns = list(data.columns[0:])  # Convert Index object to a list
 
     # Convert start_date and end_date to match the data format ("%B-%Y")
     start_date_str = start_date.strftime("%B-%Y")
@@ -227,8 +226,6 @@ def download_pivot_table_excel(pivot_table):
         margin-bottom:15px;
     }
     """
-
-    # Display the button with the CSS styles
     st.markdown(f'<style>{style}</style>', unsafe_allow_html=True)
     st.markdown(f'<div class="download-container">{href}</div>', unsafe_allow_html=True)
 
@@ -236,39 +233,38 @@ def download_pivot_table_excel(pivot_table):
 def find_countries_with_cpli_or_base(df, selected_start_date, selected_end_date, selected_countries=None):
     country_notes = []
 
-    # Filter the DataFrame based on the selected start and end dates
     filtered_df = df[(df['Year'] >= selected_start_date.year) & (df['Year'] <= selected_end_date.year)]
 
-    # Remove duplicate entries based on 'Year', 'Country', and 'Note'
     filtered_df = filtered_df.drop_duplicates(subset=['Country', 'Note'])
 
-    # Iterate over each row in the filtered DataFrame
     for _, row in filtered_df.iterrows():
         year = row['Year']
         note = row['Note']
 
-        # Check if the note contains "CPI", "Base", or "base" followed by a year in the format YYYY
         if re.search(r'(CPI|Base|base)\s+(\d{4})', str(note), re.IGNORECASE):
             country = row['Country']
 
-            # If selected_countries is provided and current country is not in the list, skip it
             if selected_countries is not None and country not in selected_countries:
                 continue
 
             country_notes.append({'year': year, 'country': country, 'note': note})
 
-    # Print the selected countries' notes
     for item in country_notes:
         st.write("Note: "f"{item['country']} {item['note']}")
 
     return country_notes
 
 
-def category_data(df):
-    max_row = df[df["Value"] == df["Value"].max()]
-    min_row = df[df["Value"] == df["Value"].min()]
-    avg_value = df["Value"].mean()
-    update_frequency = df["Update frequency"].iloc[0]
+def category_data(df, start_date, end_date):
+    start_date = pd.to_datetime(start_date, format='%Y-%m')
+    end_date = pd.to_datetime(end_date, format='%Y-%m')
+    filtered_df = df[(df['YearMonth'] >= start_date) & (df['YearMonth'] <= end_date)]
+
+    max_row = filtered_df[filtered_df["Value"] == filtered_df["Value"].max()]
+    min_row = filtered_df[filtered_df["Value"] == filtered_df["Value"].min()]
+    avg_value = filtered_df["Value"].mean()
+    update_frequency = filtered_df["Update frequency"].iloc[0]
+
     return max_row, min_row, avg_value, update_frequency
 
 
@@ -305,7 +301,8 @@ def business_partners(df):
             unsafe_allow_html=True
         )
         new_table = load_data(filtered_df)
-        max_row, min_row, avg_value, update_frequency = category_data(filtered_df)
+        max_row, min_row, avg_value, update_frequency = category_data(filtered_df, selected_start_date,
+                                                                      selected_end_date)
         col1, col2, col3, col4 = st.columns(4)
 
         box_color = "rgba(161, 219, 255, 0.3)"
@@ -322,7 +319,7 @@ def business_partners(df):
             st.markdown(
                 f'<div style="border: 2px solid {border_color}; padding: 10px; border-radius: 5px; margin-top: 10px;">'
                 f'<span style="font-size: 18px;">{max_row["Country"].values[0]}</span>: <br>'
-                f'<span style="font-size: 24px;">{max_row["Value"].values[0]}%</span></div>',
+                f'<span style="font-size: 24px;">{max_row["Value"].values[0]}</span></div>',
                 unsafe_allow_html=True
             )
 
@@ -337,7 +334,7 @@ def business_partners(df):
             st.markdown(
                 f'<div style="border: 2px solid {border_color}; padding: 10px; border-radius: 5px; margin-top: 10px;">'
                 f'<span style="font-size: 18px;">{min_row["Country"].values[0]}</span>: <br>'
-                f'<span style="font-size: 24px;">{min_row["Value"].values[0]}%</span></div>',
+                f'<span style="font-size: 24px;">{min_row["Value"].values[0]}</span></div>',
                 unsafe_allow_html=True
             )
 
@@ -352,7 +349,7 @@ def business_partners(df):
             st.markdown(
                 f'<div style="border: 2px solid {border_color}; padding: 10px; border-radius: 5px; margin-top: 10px;">'
                 f'<span style="font-size: 18px;">{"Average Rate"}</span>: <br>'
-                f'<span style="font-size: 24px;">{avg_value}%</span></div>',
+                f'<span style="font-size: 24px;">{avg_value}</span></div>',
                 unsafe_allow_html=True
             )
 
@@ -419,7 +416,8 @@ def competitors(df):
             unsafe_allow_html=True
         )
         new_table = load_data(filtered_df)
-        max_row, min_row, avg_value, update_frequency = category_data(filtered_df)
+        max_row, min_row, avg_value, update_frequency = category_data(filtered_df, selected_start_date,
+                                                                      selected_end_date)
         col1, col2, col3, col4 = st.columns(4)
 
         box_color = "rgba(161, 219, 255, 0.3)"
@@ -436,7 +434,7 @@ def competitors(df):
             st.markdown(
                 f'<div style="border: 2px solid {border_color}; padding: 10px; border-radius: 5px; margin-top: 10px;">'
                 f'<span style="font-size: 18px;">{max_row["Country"].values[0]}</span>: <br>'
-                f'<span style="font-size: 24px;">{max_row["Value"].values[0]}%</span></div>',
+                f'<span style="font-size: 24px;">{max_row["Value"].values[0]}</span></div>',
                 unsafe_allow_html=True
             )
 
@@ -451,7 +449,7 @@ def competitors(df):
             st.markdown(
                 f'<div style="border: 2px solid {border_color}; padding: 10px; border-radius: 5px; margin-top: 10px;">'
                 f'<span style="font-size: 18px;">{min_row["Country"].values[0]}</span>: <br>'
-                f'<span style="font-size: 24px;">{min_row["Value"].values[0]}%</span></div>',
+                f'<span style="font-size: 24px;">{min_row["Value"].values[0]}</span></div>',
                 unsafe_allow_html=True
             )
 
@@ -466,7 +464,7 @@ def competitors(df):
             st.markdown(
                 f'<div style="border: 2px solid {border_color}; padding: 10px; border-radius: 5px; margin-top: 10px;">'
                 f'<span style="font-size: 18px;">{"Average Rate"}</span>: <br>'
-                f'<span style="font-size: 24px;">{avg_value}%</span></div>',
+                f'<span style="font-size: 24px;">{avg_value}</span></div>',
                 unsafe_allow_html=True
             )
 
@@ -528,7 +526,7 @@ def default_mode(df):
         unsafe_allow_html=True
     )
     new_table = load_data(def_df)
-    max_row, min_row, avg_value, update_frequency = category_data(def_df)
+    max_row, min_row, avg_value, update_frequency = category_data(def_df, selected_start_date, selected_end_date)
     col1, col2, col3, col4 = st.columns(4)
 
     box_color = "rgba(161, 219, 255, 0.3)"
@@ -545,7 +543,7 @@ def default_mode(df):
         st.markdown(
             f'<div style="border: 2px solid {border_color}; padding: 10px; border-radius: 5px; margin-top: 10px;">'
             f'<span style="font-size: 18px;">{max_row["Country"].values[0]}</span>: <br>'
-            f'<span style="font-size: 24px;">{max_row["Value"].values[0]}%</span></div>',
+            f'<span style="font-size: 24px;">{max_row["Value"].values[0]}</span></div>',
             unsafe_allow_html=True
         )
 
@@ -560,7 +558,7 @@ def default_mode(df):
         st.markdown(
             f'<div style="border: 2px solid {border_color}; padding: 10px; border-radius: 5px; margin-top: 10px;">'
             f'<span style="font-size: 18px;">{min_row["Country"].values[0]}</span>: <br>'
-            f'<span style="font-size: 24px;">{min_row["Value"].values[0]}%</span></div>',
+            f'<span style="font-size: 24px;">{min_row["Value"].values[0]}</span></div>',
             unsafe_allow_html=True
         )
 
@@ -575,7 +573,7 @@ def default_mode(df):
         st.markdown(
             f'<div style="border: 2px solid {border_color}; padding: 10px; border-radius: 5px; margin-top: 10px;">'
             f'<span style="font-size: 18px;">{"Average Rate"}</span>: <br>'
-            f'<span style="font-size: 24px;">{avg_value}%</span></div>',
+            f'<span style="font-size: 24px;">{avg_value}</span></div>',
             unsafe_allow_html=True
         )
 
@@ -609,11 +607,7 @@ def default_mode(df):
 
 
 def Dashboard():
-    df = pd.read_csv(thyda_dir)
-    db = Database(host, password, user, table=your_table_name, database=database_name)
-    # df = db.read_database(your_condition='Year >= 2018')
-
-
+    df = pd.read_csv(Inflation)
 
     hide_st_style = """
                 <style>
@@ -633,11 +627,6 @@ def Dashboard():
         unsafe_allow_html=True
     )
 
-    # Add content below the box
-    # st.write('ប្រទេសដៃគូប្រកួតប្រជែង និងប្រទេសដៃគូពាណិជ្ជកម្ម')
-
-    # Side Bar
-
     st.sidebar.image("https://www.minimumwage.gov.kh/wp-content/uploads/2017/11/logo_ministry_for_mobile.png")
     options = st.sidebar.selectbox(
         'Choose Category',
@@ -649,7 +638,6 @@ def Dashboard():
         business_partners(df)
     elif options == 'Competitors':
         competitors(df)
-
     else:
         default_mode(df)
 

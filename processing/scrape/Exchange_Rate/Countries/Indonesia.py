@@ -45,7 +45,7 @@ class ExchangeRate(WebDriverHandler):
     """
     def __init__(self, path, day, month, year):
         super().__init__()
-        self.path = path
+        self.path = os.path.join(path, 'Indonesia')
         self.day = day
         self.month = month
         self.year = year
@@ -171,7 +171,7 @@ class ExchangeRate(WebDriverHandler):
             - Create the destination directory if it doesn't exist
         """
         os.makedirs(self.path, exist_ok=True)
-        filename = f"Exchange_Rate_Indonesia_{date_value}.xlsx"
+        filename = f"{date_value}.xlsx"
 
         # Specify the path for the files
         xlsx_file_path = self.path + '\\' + filename

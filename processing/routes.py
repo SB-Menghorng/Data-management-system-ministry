@@ -1,67 +1,17 @@
 import threading
 from datetime import datetime
 
-import psutil
-
 from processing import app
 from flask import request, session
+
+from processing.Streamlit.streamlit import start_dashboard, start_excel
 from processing.scrape import DomesticData, International
-from processing.constant import psf
 from flask import render_template
-import subprocess
+
 
 @app.route('/instruction')
 def instruction():
     return render_template('instruction.html')
-
-# Define the Streamlit process globally
-streamlit_process = None
-
-
-# Function to start the Streamlit process in a separate thread
-def start_streamlit():
-    """
-    Function to start a Streamlit application in a separate thread.
-
-    This function manages the execution of a Streamlit application, ensuring that it is started as a subprocess,
-    capturing its standard output and error streams, handling errors, and preventing multiple instances from running
-    simultaneously.
-
-    Parameters:
-        None
-
-    Global Variables Used:
-        - streamlit_process: A global variable to store the process object representing the Streamlit application.
-
-    Returns:
-        None
-
-    Example Usage:
-        if __name__ == "__main__":
-            psf = "path_to_streamlit_app.py"  # Replace with the actual path to your Streamlit app
-            start_streamlit()
-    """
-    global streamlit_process
-
-    # Check if a Streamlit process is already running
-    if streamlit_process is None or not psutil.pid_exists(streamlit_process.pid):
-        # Streamlit is not running, so start a new process
-        streamlit_command = ["streamlit", "run", psf]
-
-        try:
-            streamlit_process = subprocess.Popen(streamlit_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                                 text=True)
-            out, err = streamlit_process.communicate()
-
-            if streamlit_process.returncode != 0:
-                print("Error running Streamlit app. Return code:", streamlit_process.returncode)
-                print("Streamlit error output:", err)
-            else:
-                print("Streamlit output:", out)
-        except Exception as e:
-            print("Error:", e)
-    else:
-        print("Streamlit is already running")
 
 
 # Route to the home page
@@ -85,9 +35,15 @@ def home_page():
        Flask response: Returns the rendered 'downloadForm.html' template as the home page of the web application.
    """
     # Start the Streamlit process in a separate thread
-    streamlit_thread = threading.Thread(target=start_streamlit)
-    streamlit_thread.start()
-    streamlit_thread.join(3)
+    dashboard_thread = threading.Thread(target=start_dashboard)
+    dashExcel_thread = threading.Thread(target=start_excel)
+
+    dashExcel_thread.start()
+    dashboard_thread.start()
+
+    dashboard_thread.join(3)  # Wait for dashboard_thread to complete for 3 seconds
+    dashExcel_thread.join(3)  # Wait for dashExcel_thread to complete for 3 seconds
+
     session.clear()
     return render_template("downloadForm.html")
 
@@ -102,20 +58,20 @@ def responding(func, name):
 
     Parameters:
         func (function): The function to be executed.
+        name (str): The name of the function or task being executed.
 
     Returns:
         dict: A dictionary containing the response status ('status') and message ('message').
 
     Example Usage:
-        response = responding(some_function)
-        :param name:
+        response = responding(some_function, "Data Download")
     """
     try:
-        func
-        responses = {'status': 'success', 'message': f'Data download from {name} successful!'}
+        func()  # Execute the input function
+        response_ = {'status': 'success', 'message': f'Data download from {name} completed successfully!'}
     except Exception as e:
-        responses = {'status': 'error', 'message': f'Error: {str(e)}'}
-    return responses
+        response_ = {'status': 'error', 'message': f'Error: {str(e)}'}
+    return response_
 
 
 # Initialize the response variable
@@ -158,9 +114,9 @@ def process_form():
         DomesticScraper = DomesticData.Scraper(path, choice)
 
         if website == 'GDP':
-            response = responding(DomesticScraper.GDP(), 'GDP')
+            response = responding(DomesticScraper.GDP, 'GDP')
         else:
-            response = responding(DomesticScraper.NBC(), 'NBC')
+            response = responding(DomesticScraper.NBC, 'NBC')
 
     if "download_button_international" in request.form:
         category = 'international'
@@ -170,8 +126,15 @@ def process_form():
         sector = request.form.get('International-Sectors')
         choice = request.form.get('international-website')
 
+        path = request.form.get('path-international')
+
         date_string = request.form.get('date')
         year_inflation = request.form.get('infYear')
+
+        start_date = request.form.get('start_date')
+        end_date = request.form.get('end_date')
+
+        month_year = request.form.get('month-year')
 
         # Convert the date string to a datetime object
         if date_string:
@@ -183,26 +146,24 @@ def process_form():
             day = date_object.day
         elif year_inflation:
             year = int(year_inflation)
+        elif month_year:
+            # Parse the input date string into a datetime object
+            parsed_date = datetime.strptime(month_year, '%Y-%m')
 
-        path = request.form.get('path-international')
-        option = request.form.get('iInternational-Sectors')
+            # Format the parsed date as 'Month, Year'
+            month_year = parsed_date.strftime('%B, %Y')
 
-        start_date = request.form.get('start_date')
-        end_date = request.form.get('end_date')
-        month_year = request.form.get('month-year')
-
-        scrapping = International.Scraper(choice=choice, destinationDir=path, option=option, day=day,
-                                          start_date=start_date, end_date=end_date, month=month, year=year,
-                                          month_year=month_year)
+        scrapping = International.Scraper(choice=choice, destinationDir=path, day=day, start_date=start_date,
+                                          end_date=end_date, month=month, year=year, month_year=month_year)
 
         if sector == 'ExchangeRate':
-            response = responding(scrapping.ExchangeRate(), 'Exchange Rate')
+            response = responding(scrapping.ExchangeRate, 'Exchange Rate')
         elif sector == 'Export':
-            response = responding(scrapping.Export(), 'Export')
+            response = responding(scrapping.Export, 'Export')
         elif sector == 'OpecBasketPrice':
-            response = responding(scrapping.OpecBasketPrice(), 'OpecBasket Price')
+            response = responding(scrapping.OpecBasketPrice, 'OpecBasket Price')
         elif sector == 'InflationRate':
-            response = responding(scrapping.InflationRate(), 'Inflation Rate')
+            response = responding(scrapping.InflationRate, 'Inflation Rate')
 
     # Store data in Flask session
     session['category'] = category
@@ -213,20 +174,25 @@ def process_form():
     return render_template("downloadForm.html", response=response)
 
 
-@app.route('/streamlit')
+@app.route('/excelDashboard')
+def excelDashBoard():
+    return render_template('excelDashBoard.html')
+
+
+@app.route('/Dashboard')
 def streamlit_page():
     """
     Route function for the Streamlit page.
 
     This function defines a route to a Streamlit page within a web application. It performs the following actions:
     - Retrieves data from the Flask session, specifically the 'category', 'path', and 'choice' variables.
-    - Renders the 'streamlit.html' template, providing the retrieved data as template variables for display on the page.
+    - Renders the 'dashBoard.html' template, providing the retrieved data as template variables for display on the page.
 
     Parameters:
         None
 
     Returns:
-        Flask response: Returns the rendered 'streamlit.html' template with category, path, and choice variables.
+        Flask response: Returns the rendered 'dashBoard.html' template with category, path, and choice variables.
 
     Example Usage:
         This function is invoked when a GET request is made to the '/streamlit' route.
@@ -236,4 +202,4 @@ def streamlit_page():
     destination = session.get('path')
     options = session.get('choice')
 
-    return render_template('streamlit.html', category=categories, path=destination, choice=options)
+    return render_template('dashBoard.html', category=categories, path=destination, choice=options)

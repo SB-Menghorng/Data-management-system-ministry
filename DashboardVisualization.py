@@ -1,9 +1,7 @@
-from processing.visualizations.test2 import visualize_economic_data
-from processing.visualizations.test import main
-from processing.visualizations.merchandise_visualizing import dom_merchandise
 import streamlit as st
-from processing.visualizations.dashborad import dashboard1
 from processing.visualizations.Inflation_Rate.Dashboard import Dashboard
+from processing.visualizations.NBC import inflation_Y_on_Y
+
 
 if __name__ == "__main__":
     st.set_page_config(
@@ -12,11 +10,14 @@ if __name__ == "__main__":
                   "-MoLVT-2.jpg",
         layout="wide",
         initial_sidebar_state="collapsed"
-        #     menu_items={
-        #         'Get Help': 'https://www.extremelycoolapp.com/help',
-        #         'Report a bug': 'https://www.extremelycoolapp.com/bug',
-        #         'About' :"This is a header. This is an *extremely* cool app!"
-        # }
+    )
+    st.sidebar.markdown(
+        """
+        <div style="display: flex; align-items: center; justify-content: center; margin-top: auto; margin-bottom: 15px; background-color: white; border-radius: 4%;">
+            <img src="https://www.minimumwage.gov.kh/wp-content/uploads/2017/11/logo_ministry_for_mobile.png" alt="logo" style="width: 300px;">
+        </div>
+        """,
+        unsafe_allow_html=True
     )
 
     # read_and_delete_shared_data()
@@ -47,11 +48,11 @@ if __name__ == "__main__":
     # # Handle unexpected values of 'category'
     # st.write("Invalid category value.")
     # Create a select for menu selection
-    option = st.sidebar.selectbox("Select a dashboard:", ["Inflation Rate", "Dashboard 2"])
+    option = st.sidebar.selectbox("Select a dashboard:", ["Inflation Rate", "Contribution Inflation", "OpecBasket Price"])
     # Use conditional statements to display the selected dashboard
     if option == "Inflation Rate":
         Dashboard()
 
-    elif option == "Dashboard 2":
-        Dashboard()
-    # elif option == "Dashboard 3":pass
+    elif option == "Contribution Inflation":
+        inflation_Y_on_Y.main()
+
