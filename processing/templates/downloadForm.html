@@ -84,7 +84,6 @@
       displayAlert('error', responseData.message); // Use 'danger' for error messages
     }
   {% endif %}
-
   function displayAlert(type, message) {
       const alertDiv = document.getElementById('download-status');
       alertDiv.innerHTML = '<div class="alert alert-' + type + '">' + message + '</div>';

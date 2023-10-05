@@ -8,7 +8,7 @@ from streamlit_option_menu import option_menu
 from io import BytesIO
 from processing.cleaning import cleaner
 from processing.cleaning.NBC.NBC_Clean import NBC_14
-from processing.constant import excelName2
+from processing.constant import domestic_contributionInflation
 
 
 def load_dataset(df):
@@ -160,7 +160,7 @@ def main():
         unsafe_allow_html=True
     )
 
-    df1, df2 = NBC_14(excelName2)
+    df1, df2 = NBC_14(domestic_contributionInflation)
 
     with st.expander("Options", expanded=True):
         selected = option_menu(

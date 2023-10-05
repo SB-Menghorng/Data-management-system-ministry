@@ -1,7 +1,7 @@
 import pandas as pd
 from datetime import datetime
 from processing.connection.database import Database
-from processing.constant import host, user, table_name1, database_name, password
+from processing.constant import host, user, internationalIFR_table, database_name, password
 
 current_year = datetime.now().year
 
@@ -66,7 +66,7 @@ def Inflation_rate(end_year):
 
 
 def main():
-    db = Database(host, password, user, table=table_name1, database=database_name)
+    db = Database(host, password, user, table=internationalIFR_table, database=database_name)
     # db.create_table()
     df = Inflation_rate(current_year)
     df = df[df['Year'] >= 2018]

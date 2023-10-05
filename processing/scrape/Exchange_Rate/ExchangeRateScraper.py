@@ -2,6 +2,13 @@ import os
 from processing.scrape.Exchange_Rate.Countries import ADB, Bangladesh, China, Indonesia, Thailand
 
 
+def exp(fun):
+    try:
+        fun()
+    except Exception as e:
+        print('Error', e)
+
+
 class ExchangeRate:
     """
     The `ExchangeRate` class provides methods for scraping exchange rate data from various countries' official sources.
@@ -30,11 +37,8 @@ class ExchangeRate:
 
     def scrape(self):
         if self.option == 'All':
-            self.ADB()
-            self.Bangladesh()
-            self.China()
-            self.Indonesia()
-            self.Thailand()
+            for fun in [self.ADB, self.Bangladesh(), self.China(), self.Indonesia(), self.Thailand()]:
+                exp(fun)
         elif self.option == 'ADB':
             self.ADB()
         elif self.option == 'Bangladesh':

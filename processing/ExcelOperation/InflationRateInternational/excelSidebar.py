@@ -67,8 +67,6 @@ def timestamp_check(df, countries):
                 return month_mapping.get(month.capitalize(), 'UnknownMonth')
             except AttributeError:
                 return 'UnknownMonth'
-        else:
-            return month
 
     # Apply the month mapping function to the 'Month' column
     df['Month'] = df['Month'].apply(map_month)

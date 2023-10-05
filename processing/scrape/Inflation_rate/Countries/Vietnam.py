@@ -1,6 +1,6 @@
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
-from processing.constant import user, table_name1, host, password, database_name
+from processing.constant import user, internationalIFR_table, host, password, database_name
 from processing.connection.database import Database
 from processing.scrape.Inflation_rate.Operations.extract_xml import extract_xml
 from processing.scrape.Inflation_rate.Operations import calculate
@@ -163,7 +163,7 @@ class Scraper:
         """
 
         # Create a Database instance
-        db = Database(host, password, user, table=table_name1, database=database_name)
+        db = Database(host, password, user, table=internationalIFR_table, database=database_name)
         # Set default values if parameters are not provided
         if option is None:
             option = 'Consumer Price Index'

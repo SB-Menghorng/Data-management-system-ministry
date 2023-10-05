@@ -144,6 +144,11 @@ def process_form():
             year = date_object.year
             month = date_object.month
             day = date_object.day
+
+            start_date = date_string
+            end_date = date_string
+            month_year = date_object.strftime('%B, %Y')
+
         elif year_inflation:
             year = int(year_inflation)
         elif month_year:

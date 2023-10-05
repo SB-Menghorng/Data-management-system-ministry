@@ -3,7 +3,7 @@ import pandas as pd
 from processing.ExcelOperation.InflationRateInternational.excelSidebar import date_input_sidebar, timestamp_check
 from processing.connection.database import Database
 from processing.connection.excel import Excel
-from processing.constant import host, password, user, database_name, table_name1, table_name2, excelPathConst, \
+from processing.constant import host, password, user, database_name, internationalIFR_table, internationalCPI_table, excelPathConst, \
     sheetNameConst
 
 
@@ -54,10 +54,10 @@ def dashboardExcel():
         """,
         unsafe_allow_html=True
     )
-    db = Database(host=host, password=password, user=user, database=database_name, table=table_name1)
+    db = Database(host=host, password=password, user=user, database=database_name, table=internationalIFR_table)
 
-    df1 = db.read_database(table_name=table_name1)
-    df2 = db.read_database(table_name=table_name2)
+    df1 = db.read_database(table_name=internationalIFR_table)
+    df2 = db.read_database(table_name=internationalCPI_table)
 
     st.sidebar.subheader("Configure the Table")
     options = st.sidebar.selectbox(

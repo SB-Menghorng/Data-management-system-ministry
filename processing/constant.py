@@ -22,9 +22,6 @@ headers = {
 # Add the directory path for inflation rate Streamlit testing
 InflationInternational = r"D:\Intership\Labour ministry of combodain\test\SampleSpreadSheet.csv"
 
-# File test
-fltest = r"some_asean_and_european_currencies_against_khmer_riel_end_period.csv"
-
 # Opec Basket Price
 opec_file = r"D:\Intership\Labour ministry of combodain\demo\International\OPEC\OPEC_Basket_Price.csv"
 
@@ -33,8 +30,8 @@ host = 'localhost'
 password = 'menghorng'
 user = 'root'
 database_name = 'Economic'
-table_name1 = 'Inflation'
-table_name2 = 'Consumer_Price_Index'
+internationalIFR_table = 'Inflation'
+internationalCPI_table = 'Consumer_Price_Index'
 
 # Create a SQLAlchemy engine for database connection
 engine = create_engine(url=f"mysql+mysqlconnector://{user}:{password}@{host}/{database_name}", pool_recycle=3600)
@@ -45,8 +42,9 @@ excelName1 = r"D:\Intership\Labour ministry of combodain\test\DataSampleForCheck
 sheet_name = "DatabaseSample"
 
 # Excel FIle name on Inflation Domestic
-excelName2 = (r"D:\Intership\Labour ministry of combodain\demo\DomesticData\NBC\monetary_and_financial_statistics_data"
-              r"\14.contributiontoinflationjun-23_6926.xlsx")
+domestic_contributionInflation = (r"D:\Intership\Labour ministry of "
+                                  r"combodain\demo\DomesticData\NBC\monetary_and_financial_statistics_data"
+                                  r"\14.contributiontoinflationjun-23_6926.xlsx")
 
 # Relate to Databases Management if there are no input of location of it will store here.
 excelPathConst = r"D:\Intership\Labour ministry of combodain\test1\Data.xlsx"

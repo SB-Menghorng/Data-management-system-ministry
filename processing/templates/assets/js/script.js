@@ -89,8 +89,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 hideAdditionalInfo(inDestinationDirectory)
         } else if (this.value === 'ExchangeRate'){
                 hideAdditionalInfo(startEnd);
-                hideAdditionalInfo(monthYear);
-                showAdditionalInfo(date);
+                showAdditionalInfo(monthYear);
+                hideAdditionalInfo(date);
                 showAdditionalInfo(inDestinationDirectory)
                 hideAdditionalInfo(inflationYear)
         }
@@ -105,8 +105,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
         if (this.value === "All") {
-            showAdditionalInfo(startEnd);
-            hideAdditionalInfo(date);
+            hideAdditionalInfo(startEnd);
+            showAdditionalInfo(date);
             hideAdditionalInfo(monthYear);
         } else if (this.value === "ADB") {
             hideAdditionalInfo(startEnd);

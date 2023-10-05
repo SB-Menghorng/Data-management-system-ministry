@@ -111,5 +111,4 @@ class InflationRateScraper:
             return df1[['Country', 'Source', 'Update frequency', 'Status', 'Year', 'Month', 'Value', 'Publish Date',
                         'Link', 'Note']]
 
-# scp = InflationRateScraper(WebDriverHandler())
-# print(scp.extract_data().to_csv('japan.csv', index=False))
+

@@ -12,20 +12,7 @@ if __name__ == "__main__":
         layout="wide",
         initial_sidebar_state="expanded",
     )
-
     st.sidebar.image("https://www.minimumwage.gov.kh/wp-content/uploads/2017/11/logo_ministry_for_mobile.png")
-
-
-    # read_and_delete_shared_data()
-    query_params = st.experimental_get_query_params()
-    category = query_params.get("category", [None])[0]
-    path = query_params.get("path", [""])[0]
-    choice = query_params.get("choice", [""])[0]
-    shared_data = {
-        'category': category,
-        'path': path,
-        'choice': choice
-    }
 
     option = st.sidebar.selectbox("Select a dashboard:",
                                   ["Inflation Rate", "Contribution Inflation", "OpecBasket Price"])

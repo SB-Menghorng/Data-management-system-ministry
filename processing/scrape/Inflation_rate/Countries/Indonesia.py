@@ -8,7 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import mysql.connector as sql
 from sqlalchemy import text
-from processing.constant import user, table_name1, database_name, host, password, engine
+from processing.constant import user, internationalIFR_table, database_name, host, password, engine
 
 pd.set_option("display.max_rows", None)
 pd.set_option("display.max_columns", 5)
@@ -321,7 +321,7 @@ def main(driver):
     your_user = user
     your_password = password
     your_database = database_name
-    your_db_table = table_name1
+    your_db_table = internationalIFR_table
     your_db_condition = 'Year = 2022'
 
     # URL of the page
