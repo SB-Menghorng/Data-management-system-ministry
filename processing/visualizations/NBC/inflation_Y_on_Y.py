@@ -6,6 +6,9 @@ import calendar
 import plotly.graph_objects as go
 from streamlit_option_menu import option_menu
 from io import BytesIO
+from processing.cleaning import cleaner
+from processing.cleaning.NBC.NBC_Clean import NBC_14
+from processing.constant import excelName2
 
 
 def load_dataset(df):
@@ -18,7 +21,7 @@ def load_dataset(df):
 
 
 def select_date_range(df):
-    st.sidebar.image("https://www.minimumwage.gov.kh/wp-content/uploads/2017/11/logo_ministry_for_mobile.png")
+    # st.sidebar.image("https://www.minimumwage.gov.kh/wp-content/uploads/2017/11/logo_ministry_for_mobile.png")
     st.sidebar.subheader("Select Date")
     # Start month and year
     start_month = st.sidebar.selectbox("Start Month", list(calendar.month_name)[1:], key="start_month_select")
@@ -138,13 +141,6 @@ def plot_bar_chart(df):
 
 # Main Streamlit app
 def main():
-    st.set_page_config(
-        page_title="Ministry of Labour and Vocational Training",
-        page_icon="https://res.cloudinary.com/aquarii/image/upload/v1643955074/Ministry-of-Labour-Vocational-Training"
-                  "-MoLVT-2.jpg",
-        layout="wide",
-
-    )
 
     hide_st_style = """
                 <style>
@@ -164,6 +160,8 @@ def main():
         unsafe_allow_html=True
     )
 
+    df1, df2 = NBC_14(excelName2)
+
     with st.expander("Options", expanded=True):
         selected = option_menu(
             menu_title=None,
@@ -176,10 +174,10 @@ def main():
 
     if selected == "Year on Year":
 
-        file_path = "Inflation_All_Items_Year_on_Year.csv"
+        # file_path = "Inflation_All_Items_Year_on_Year.csv"
         # Load the dataset
-        df = pd.read_csv(file_path)
-        df = load_dataset(df)
+        # df = pd.read_csv(file_path)
+        df = load_dataset(df2)
 
         filtered_df = select_date_range(df)
 
@@ -192,10 +190,10 @@ def main():
 
     elif selected == "Month on Month":
 
-        file_path = "Contribution_Inflation_Month_on_Month.csv"
+        # file_path = "Contribution_Inflation_Month_on_Month.csv"
         # Load the dataset
-        df = pd.read_csv(file_path)
-        df = load_dataset(df)
+        # df = pd.read_csv(file_path)
+        df = load_dataset(df1)
 
         filtered_df = select_date_range(df)
 
@@ -207,10 +205,10 @@ def main():
 
     else:
 
-        file_path = "Contribution_Inflation_Month_on_Month.csv"
+        # file_path = "Contribution_Inflation_Month_on_Month.csv"
         # Load the dataset
-        df = pd.read_csv(file_path)
-        df = load_dataset(df)
+        # df = pd.read_csv(file_path)
+        df = load_dataset(df1)
 
         df['Date'] = pd.to_datetime(df['Date'])
 

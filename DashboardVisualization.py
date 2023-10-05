@@ -4,6 +4,7 @@ from processing.visualizations.NBC import inflation_Y_on_Y
 from processing.visualizations.Opec import opecdashboard
 
 if __name__ == "__main__":
+
     st.set_page_config(
         page_title="Ministry of Labour and Vocational Training",
         page_icon="https://res.cloudinary.com/aquarii/image/upload/v1643955074/Ministry-of-Labour-Vocational-Training"
@@ -11,14 +12,9 @@ if __name__ == "__main__":
         layout="wide",
         initial_sidebar_state="expanded",
     )
-    st.sidebar.markdown(
-        """
-        <div style="display: flex; align-items: center; justify-content: center; margin-top: auto; margin-bottom: 15px; background-color: white; border-radius: 4%;">
-            <img src="https://www.minimumwage.gov.kh/wp-content/uploads/2017/11/logo_ministry_for_mobile.png" alt="logo" style="width: 300px;">
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+
+    st.sidebar.image("https://www.minimumwage.gov.kh/wp-content/uploads/2017/11/logo_ministry_for_mobile.png")
+
 
     # read_and_delete_shared_data()
     query_params = st.experimental_get_query_params()

@@ -56,7 +56,7 @@ def dashboardExcel():
     )
     db = Database(host=host, password=password, user=user, database=database_name, table=table_name1)
 
-    df2 = db.read_database(table_name=table_name1)
+    df1 = db.read_database(table_name=table_name1)
     df2 = db.read_database(table_name=table_name2)
 
     st.sidebar.subheader("Configure the Table")
@@ -156,8 +156,8 @@ def dashboardExcel():
         # statisticSummaryBox(filtered_df, selected_start_date, selected_end_date)
 
     elif options == "Business Partners":
-        comp_countries = df2["Country"].unique()
-        comp_df = df2[df2["Country"].isin(comp_countries)]
+        comp_countries = df1["Country"].unique()
+        comp_df = df1[df1["Country"].isin(comp_countries)]
         country_filter = st.sidebar.multiselect("Select Countries", comp_df["Country"].unique(),
                                                 key="competitor_countries")
         filtered_df = filter_data_by_country(comp_df, country_filter)

@@ -5,6 +5,8 @@ from io import BytesIO
 import pandas as pd
 from streamlit_option_menu import option_menu
 
+from processing.constant import opec_file
+
 
 def load_data(df):
     df = df.drop('Unnamed: 0', axis=1)
@@ -119,24 +121,16 @@ def plot_line_graph(df, start_date=None, end_date=None):
 
 
 def main():
-    st.set_page_config(
-        page_title="Ministry of Labour and Vocational Training",
-        page_icon="https://res.cloudinary.com/aquarii/image/upload/v1643955074/Ministry-of-Labour-Vocational-Training"
-                  "-MoLVT-2.jpg",
-        layout="wide",
-
-    )
-
-    st.markdown("""
-        <style>
-               .block-container {
-                    padding-top: 0rem;
-                    padding-bottom: 0rem;
-                    padding-left: 12rem;
-                    padding-right: 12rem;
-                }
-        </style>
-        """, unsafe_allow_html=True)
+    # st.markdown("""
+    #     <style>
+    #            .block-container {
+    #                 padding-top: 0rem;
+    #                 padding-bottom: 0rem;
+    #                 padding-left: 12rem;
+    #                 padding-right: 12rem;
+    #             }
+    #     </style>
+    #     """, unsafe_allow_html=True)
 
     hide_st_style = """
                 <style>
@@ -148,7 +142,7 @@ def main():
 
     st.title("OPEC Basket Price")
 
-    data_file = 'OPEC_Basket_Price.csv'
+    data_file = opec_file
     data = pd.read_csv(data_file)
     df = load_data(data)
 
@@ -173,5 +167,3 @@ def main():
         get_yearly_data(df, start_date, end_date)
 
 
-if __name__ == '__main__':
-    main()

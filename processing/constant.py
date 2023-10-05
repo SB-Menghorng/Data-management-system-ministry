@@ -20,7 +20,7 @@ headers = {
 
 # @Visualization
 # Add the directory path for inflation rate Streamlit testing
-Inflation = r"D:\Intership\Labour ministry of combodain\test\SampleSpreadSheet.csv"
+InflationInternational = r"D:\Intership\Labour ministry of combodain\test\SampleSpreadSheet.csv"
 
 # File test
 fltest = r"some_asean_and_european_currencies_against_khmer_riel_end_period.csv"
